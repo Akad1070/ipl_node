@@ -45,12 +45,53 @@ var checkErrorDev = function (err,req,res,next) {
  *	return a rendered view of Error page
  */
 var checkErrorProd = function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('/error', {
-        header: err.message,
-        msg: {}
+	res.status(err.status || 500);
+	res.render('/error', {
+		header: err.message,
+		msg: {}
 	});
 };
+
+
+
+var notFound = function(req, res){
+	// log error:
+	logger.log('[Server] 404 error: ' + req.url);
+	res.render('errors/404', {
+		status: 404,
+		locals:{ title: 'Ressource Not Found 404 :(' }
+  	});
+};
+
+var serverError = function(err, req, res, next){
+	// log error:
+
+	logger.log('[Server] ' + (err.status != 500) ? err :err.stack);
+
+	// send output based on type of request json vs html
+	var accept = req.headers.accept || '';
+
+	if (~accept.indexOf('json')) {
+		res.json({ error: "There was a server error :(" }, err.status || 500);
+  	}else{
+		res.render('errors/500', {
+			status: err.status || 500,
+			locals: { title: '500 Internal ServerError :( ' }
+	  });
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -63,9 +104,9 @@ var checkErrorProd = function(err, req, res, next) {
 
 
 var home = function (req,res,next) {
- 	res.status(200);
- 	res.render('index',{title : "Home",header : "Welcome, Goooood Moorning Foooo"});
- 	return next();
+	res.status(200);
+	res.render('index',{title : "Home",header : "Welcome, Goooood Moorning Foooo"});
+	return next();
  };
 
 
@@ -73,7 +114,7 @@ var home = function (req,res,next) {
 
 var signup = function (req,res,next) {
 	res.render('signup',{title: "SignUp",header : "Sign Up"});
- 	return next();
+	return next();
 };
 
 
@@ -108,8 +149,8 @@ var signupPosted = function (req,res,next) {
 
 
 var login = function (req,res,next) {
- 	res.render('login',{title: "Connexion",header : "Log In"});
- 	return next();
+	res.render('login',{title: "Connexion",header : "Log In"});
+	return next();
  };
 
 
@@ -146,11 +187,11 @@ var isAuth = function (req,res,next) {
 			logger.warn('[Server] Authentification Failed : '+err.message);
 			res.status(401);
 			return res.send(err.name);
-  		}
-  		logger.warn('[Server] Authorization for : ');
+		}
+		logger.warn('[Server] Authorization for : ');
 		//res.status(200).send('Hi '+"LePseudo"+', You look at my protected page :-) !');
 		return next();
-  	});
+	});
 
 };
 
@@ -169,6 +210,10 @@ var isAuth = function (req,res,next) {
 exports.beforeRequest  	= gotReq;
 exports.checkErrorDev  	= checkErrorDev;
 exports.checkErrorProd 	= checkErrorProd;
+exports.error404		= notFound;
+exports.error500		= serverError;
+
+
 exports.isAuth         	= isAuth;
 
 

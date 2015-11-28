@@ -13,7 +13,7 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 			,url  : _url
 			,method : _method || 'GET'
 			,data : _data
-	}); 
+	});
 
 
 	if(cbDone)
@@ -61,6 +61,8 @@ $(function() {
 				, function(data) {	console.log('Error Index : '+data);	}
 			);
 
+
+			// Click on the nav link on top
 			$('a').click(function(e) {
 				e.preventDefault();
 				var url = e.target.getAttribute("href");
@@ -80,8 +82,15 @@ $(function() {
 							$('.container').append('<p>Your session has expires. Please login again to continue.<p>' );
 						}
 					}
-			);
-	});
+				);
+			});
+
+
+			// Send any form
+			$('form').submit(function (e) {
+				e.preventDefault();
+				var inputs = $('form input');
+			});
 
 
 		break;

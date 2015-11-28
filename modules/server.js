@@ -175,7 +175,8 @@ var _configureRoutes = function () {
 
 
 	/* The 404 Route (ALWAYS Keep this as the last route) */
-	//app.get('/*', defRoute.checkErrorProd);
+	app.use(defRoute.notFound); // 404 handler
+	app.use(defRoute.serverError); // 500 handler
 };
 
 
