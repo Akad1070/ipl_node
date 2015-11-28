@@ -1,1 +1,1 @@
-web:node init
+web: node music.js
