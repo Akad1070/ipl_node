@@ -42,7 +42,7 @@ var _client ;
  * @param {Function} cb The function called after connected or not.
  */
 var connect = function (port,host,cb) {
-    _client = redis.createClient(process.env.REDIS_URL);
+    _client = redis.createClient(process.env.DB_REDIS_URL);
     _client.on('connect',function(err) {
         if(err)
             if(cb) return cb(new Error('[Redis] Error on connecting the client'));

@@ -13,7 +13,8 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 			,url  : _url
 			,method : _method || 'GET'
 			,data : _data
-	});
+	}); 
+
 
 	if(cbDone)
 		reqAjax.done(function (data) {
