@@ -10,7 +10,6 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 				'Accept' : 'text/javascript; charset=utf-8'
 				, 'api-token' : sessionStorage.getItem('token')
 			}
-			,async:true
 			,url  : _url
 			,method : _method || 'GET'
 			,data : _data
@@ -36,13 +35,7 @@ function setFlash(msg, status) {
 }
 
 
-
-
-
 $(function() {
-	var hash = window.location;
-	console.log(hash);
-
 	switch (location.pathname) {
 		case '/':
 
