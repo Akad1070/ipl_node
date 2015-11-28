@@ -1,0 +1,17 @@
+
+
+extends ../layout.jade
+
+
+block content
+	form(action='/ziks/update/'+zik.title, method='POST')
+		.field
+			label.field-label(for='title') Title
+			input#title.field-input(type='text', name='title', value=zik.title)
+		.field
+			label.field-label(for='author') Author
+			input#author.field-input(type='text', name='author', value=zik.author)
+		.field
+			label.field-label(for='genre') Genre
+			input#genre.field-input(type='text', name='genre', value=zik.genre)
+		input(type='submit', value='Update')

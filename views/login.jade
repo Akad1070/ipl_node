@@ -1,0 +1,13 @@
+
+extends ./layout.jade
+
+
+block content
+	form(method='POST')
+		.field
+			label.field-label(for='pseudo') Pseudo
+			input#pseudo.field-input(type='text', name='pseudo')
+		.field
+			label.field-label(for='pseudo') PassWord
+			input#passwd.field-input(type='password', name='passwd', autofocus='')
+		input#send(type='submit', value='Connect')

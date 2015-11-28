@@ -1,0 +1,23 @@
+
+extends ../layout.jade
+
+block content
+	p
+		h3
+			if msg
+				msg
+			else
+				p
+					| Listing  zik
+	if ziks
+		ul
+			each zik in ziks
+				li
+					a(href='/ziks/update/'+zik.title, title='Update '+zik.title)= zik.title
+					|  from &nbsp;
+					a(href='/ziks/list/author/'+zik.author, title='List all zik of '+ zik.author)=  zik.author
+				li Genre : #{zik.genre}
+				a(href='/ziks/update/'+zik.title, title='Update '+zik.title)  Update the details
+				br
+				a(href='/ziks/delete/'+zik.title, title='Delete '+zik.title)  Delete this shit
+		br

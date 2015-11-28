@@ -1,0 +1,22 @@
+
+extends ./layout.jade
+
+
+block content
+	form(method='POST')
+		.field
+			label.field-label(for='pseudo') Pseudo
+			input#pseudo.field-input(type='text', name='pseudo', required='', autofocus='')
+		.field
+			label.field-label(for='pseudo') Password
+			input#passwd.field-input(type='password', name='passwd', required='')
+		.field
+			label.field-label(for='pseudo') Again
+			input#passwd2.field-input(type='password', name='passwd2', required='')
+		.field
+			label.field-label(for='pseudo') FirstName
+			input#fname.field-input(type='text', name='fname')
+		.field
+			label.field-label(for='pseudo') LastName
+			input#lname.field-input(type='text', name='lname')
+		input#send(type='submit', value='Signup')

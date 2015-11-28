@@ -1,0 +1,20 @@
+extends ../layout.jade
+
+
+block content
+	p
+		msg
+
+	p
+		| Are you fully consciousness about that !
+		br
+		|   You action will be &nbsp;
+		b definitive ?!
+		br
+		|   Do you still want to delete #{zikTitle}
+		br
+		a.btn(href='/zik/list/title', title='Go back to list of zik') Cancel
+		form(method='POST', action='/ziks/delete/'+zikTitle)
+			button(type='submit') Delete that shit
+
+
