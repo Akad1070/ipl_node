@@ -15524,3 +15524,9 @@ warning: bind_ip of 0.0.0.0 is unnecessary; listens on all ips by default
 2015-11-28T17:58:49.977+0000 [clientcursormon] mem (MB) res:4 virt:338
 2015-11-28T17:58:49.977+0000 [clientcursormon]  mapped:160
 2015-11-28T17:58:49.977+0000 [clientcursormon]  connections:0
+2015-11-28T18:03:50.002+0000 [clientcursormon] mem (MB) res:4 virt:338
+2015-11-28T18:03:50.002+0000 [clientcursormon]  mapped:160
+2015-11-28T18:03:50.002+0000 [clientcursormon]  connections:0
+2015-11-28T18:08:50.016+0000 [clientcursormon] mem (MB) res:4 virt:338
+2015-11-28T18:08:50.016+0000 [clientcursormon]  mapped:160
+2015-11-28T18:08:50.016+0000 [clientcursormon]  connections:0

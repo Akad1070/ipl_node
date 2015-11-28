@@ -40,18 +40,8 @@ function setFlash(msg, status) {
 
 
 $(function() {
-
-	console.log(location.pathname);
-
 	var hash = window.location;
 	console.log(hash);
-
-
-
-
-
-
-
 
 	switch (location.pathname) {
 		case '/':
@@ -137,12 +127,9 @@ $(function() {
 
 			break;
 		default:
-			// If the current page isn't login
 				// No token --> no visit
-			if(!sessionStorage.getItem('token')){
+			if(!sessionStorage.getItem('token'))
 			 	location.href = '/login';
-			 	return;
-			}
 			break;
 
 	}
