@@ -32,3 +32,6 @@ warning: bind_ip of 0.0.0.0 is unnecessary; listens on all ips by default
 2015-11-28T22:49:03.877+0000 [initandlisten] options: { net: { bindIp: "0.0.0.0", http: { RESTInterfaceEnabled: true, enabled: true } }, storage: { dbPath: "data", journal: { enabled: false } } }
 2015-11-28T22:49:03.963+0000 [initandlisten] waiting for connections on port 27017
 2015-11-28T22:49:03.963+0000 [websvr] admin web console waiting for connections on port 28017
+2015-11-28T22:50:03.887+0000 [clientcursormon] mem (MB) res:76 virt:319
+2015-11-28T22:50:03.887+0000 [clientcursormon]  mapped:160
+2015-11-28T22:50:03.887+0000 [clientcursormon]  connections:0
