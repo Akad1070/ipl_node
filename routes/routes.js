@@ -105,8 +105,8 @@ var serverError = function(err, req, res, next){
 
 var home = function (req,res,next) {
 	res.status(200);
-	res.render('index',{title : "Home",header : "Welcome, Goooood Moorning Foooo"});
-	return next();
+	res.render('home',{title : "Home",header : "Welcome to NodeZikApp"});
+	//return next();
  };
 
 

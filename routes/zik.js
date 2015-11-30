@@ -70,7 +70,7 @@ var lister = function (req,res,next) {
 			logger.warn(err.message);
 			res.status(401);
 		}else{
-			logger.info(msg );
+			logger.info('[ZikDAO] '+msg );
 			res.status(200);
 		}
 		//console.dir(datas);

@@ -53,7 +53,7 @@ var add = function (selectObj,nObj,cb) {
 		mongo.insert(docZiks,selectObj,nObj,{ upsert: true},function (err, result) {
 			if(err)
 				if(cb) return cb(' '+err);
-			if(cb) return cb(null,result,' Inserted of '+result.title);
+			if(cb) return cb(null,result,'Inserted of '+result.title);
 		});
 	});
 };
@@ -74,7 +74,7 @@ var listBy = function (obj,cb) {
 			var val = obj[Object.keys(obj)[0]]  || 'all' ;  val = '\''+val+'\'';
 			if(err)
 				if(cb) return cb(new Error('[ZikDao] '+err.message + ' for '+val));
-			if(cb) return cb(null,docs,' Found '+docs.length+' zik(s) for '+ val);
+			if(cb) return cb(null,docs,'Found '+docs.length+' zik(s) for '+ val);
 		});
 
 	});
@@ -94,7 +94,7 @@ var listnSortByField = function (obj,cb) {
 			var val = Object.keys(obj['fields'])[0]  || 'all';
 			if(err)
 				if(cb) return ( (cb) ? cb(new Error('[ZikDao]  '+err.message + ' by '+val)): null);
-			if(cb) return cb(null,docs,' Found '+docs.length+' zik(s) by '+ val);
+			if(cb) return cb(null,docs,'Found '+docs.length+' zik(s) by '+ val);
 		});
 
 	});

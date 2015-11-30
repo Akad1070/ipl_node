@@ -166,7 +166,7 @@ var addZik = function (tit,aut,gen,cb) {
 			if(gen && typeof gen == 'string'){
 				zikDAO.add({'title' : tit},{'title' : tit, 'author' : aut, 'genre' : gen}, function (err,data,msg){
 					if(err)	if(cb) return cb(err);
-					if(cb) return cb(null,data,msg);
+					if(cb) return cb(null,data,'[ZikDAO] '+msg);
 				});
 			}
 		}

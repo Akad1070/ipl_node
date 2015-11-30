@@ -36,10 +36,57 @@ function setFlash(msg, status) {
 }
 
 
+
+
+
 $(function() {
+
+	// Click on the nav link on top
+	$('nav a').click(function(e) {
+		e.preventDefault();
+		var url = e.target.getAttribute("href");
+		launchAjaxRequest(url,null,null
+			,function(datas) {
+				if(url === '/logout'){
+					sessionStorage.removeItem('token');
+		    		window.location.href = '/'; // Redirect to the homePage
+				}else{
+					$('.container').html($(datas));
+					$('a .list').click(function (e){
+						e.preventDefault();
+						var url = $(this).attr('href');
+						launchAjaxRequest(url, null,null
+							,function (data) {
+								$('#listing').html($(data));
+							}
+							, function(data) {	console.log('Error Index : '+data);	}
+						);
+					});
+				}
+			},function(err) {
+				if(err.responseText === 'TokenExpiredError'){
+					setFlash('Your session has expires. Please login again to continue', 'error');
+					//window.location.href = '/login';
+				}
+			}
+		);
+	});
+
+
+
+
+	// Send any form
+	$('#send').click(function (e) {
+		e.preventDefault();
+		var inputs = $('form > input');
+		console.log(inputs);
+		e.preventDefault();
+	});
+
+
+
 	switch (location.pathname) {
 		case '/':
-
 			// No token --> no visit
 			if(!sessionStorage.getItem('token')){
 			 	location.href = '/login';
@@ -49,50 +96,14 @@ $(function() {
 			}
 
 			// GET All ziks for the homepage
-			launchAjaxRequest('/api/ziks', null,null
+			launchAjaxRequest('/ziks/by/title', null,null
 				,function (datas) {
-					var musics = $('#musics');
-					musics.append('<h2>All ziks added</h2>');
-					datas.forEach(function (data){
-						musics.append('<label><b>'+data.author+'</b> --- '+data.title +'<label>');
-						musics.append('<br/>');
-					});
+					var list = $('#listing');
+					list.append('<h2>All ziks added</h2>');
+					list.append(datas)
 				}
 				, function(data) {	console.log('Error Index : '+data);	}
 			);
-
-
-			// Click on the nav link on top
-			$('a').click(function(e) {
-				e.preventDefault();
-				var url = e.target.getAttribute("href");
-				launchAjaxRequest(url,null,null
-					,function(datas) {
-						if(url === '/logout'){
-							sessionStorage.removeItem('token');
-				    		window.location.href = '/'; // Redirect to the homePage
-						}else{
-							//alert(datas);
-							//$('html').html($(datas));
-							document.getElementsByTagName('html')[0].innerHTML = datas;
-						}
-					},function(err) {
-						if(err.responseText === 'TokenExpiredError'){
-							window.location.href = '/login';
-							$('.container').append('<p>Your session has expires. Please login again to continue.<p>' );
-						}
-					}
-				);
-			});
-
-
-			// Send any form
-			$('form').submit(function (e) {
-				e.preventDefault();
-				var inputs = $('form input');
-			});
-
-
 		break;
 
 		case '/login' :

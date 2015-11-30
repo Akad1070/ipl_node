@@ -1,22 +1,24 @@
 {
-  "name": "ipl_cloud",
-  "version": "1.0.0",
+  "name"       : "ipl_cloud",
+  "version"    : "1.0.0",
   "description": "",
-  "main": "music.js",
+  "main"       : "music.js",
   "dependencies": {
-    "bcrypt": "^0.8.5",
-    "body-parser": "^1.14.1",
-    "express":"4.13.3",
-    "jade": "^1.11.0",
+    "bcrypt"      : "^0.8.5",
+    "body-parser" : "^1.14.1",
+    "express"     :"4.13.3",
+    "jade"        : "^1.11.0",
     "jsonwebtoken": "^5.4.1",
-    "mongodb": "^2.0.48",
-    "redis": "^2.4.1",
-    "winston": "^1.0.2"
+    "mongodb"     : "^2.0.48",
+    "redis"       : "^2.4.1",
+    "winston"     : "^1.0.2"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "scripts" : {
+    "test"     : "echo \"Error: no test specified\" && exit 1",
+    "start"    : "set NODE_ENV=prod&&node music.js",
+    "start_dev": "set NODE_ENV=dev&&node music.js",
   },
-  "author": "Ko1l",
+  "author" : "Ko1l",
   "license": "MIT"
 }
