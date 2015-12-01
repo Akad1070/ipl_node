@@ -15,9 +15,9 @@
   },
   "devDependencies": {},
   "scripts" : {
-    "test"     : "echo \"Error: no test specified\" && exit 1",
-    "start"    : "set NODE_ENV=prod&&node music.js",
-    "start_dev": "set NODE_ENV=dev&&node music.js",
+    "test": "echo \"Error: no test specified in my ass\" && exit 1",
+    "prod": "set NODE_ENV=prod && node music.js",
+    "dev" : "set NODE_ENV=dev && node music.js"
   },
   "author" : "Ko1l",
   "license": "MIT"
