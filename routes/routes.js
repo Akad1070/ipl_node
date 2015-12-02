@@ -54,7 +54,7 @@ var checkErrorProd = function(err, req, res, next) {
 
 
 
-var notFound = function(req, res){
+var notFound = function (req, res){
 	// log error:
 	logger.log('[Server] 404 error: ' + req.url);
 	res.render('errors/404', {
@@ -63,7 +63,7 @@ var notFound = function(req, res){
   	});
 };
 
-var serverError = function(err, req, res, next){
+var serverError = function (err, req, res, next){
 	// log error:
 
 	logger.log('[Server] ' + (err.status != 500) ? err :err.stack);

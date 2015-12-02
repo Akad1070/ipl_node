@@ -187,7 +187,7 @@ var _configureRoutes = function () {
 var start = function (callback) {
 	_configureServer();
 	_configureRoutes();
-	server = app.listen(process.env.PORT, config.server.host, function () {
+	server = app.listen(process.env.PORT || 8080, config.server.host, function () {
 		logger.info('[Server] Web server listening on ' + config.server.host + ':' + process.env.PORT);
 		if (callback) callback();
 	});
