@@ -121,11 +121,11 @@ var genToken = function (dbUser) {
 
 	// Generate the token with the user pseudo & passwd
 	var token = jwt.sign(dbUser,cryptKey,{
-		//expiresIn : config.expiration
+		expiresIn : config.expiration
 	});
 
 	userDAO.insertVal('token+'+dbUser.pseudo,token,function (err,msg){
-		userDAO.expiresIn('token+'+dbUser.pseudo,config.expiration);
+		//userDAO.expiresIn('token+'+dbUser.pseudo,config.expiration);
 		return token;
 	});
 

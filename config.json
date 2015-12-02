@@ -3,7 +3,7 @@
 		"host": "0.0.0.0"
     }
 	, "secretkey" : "9ibzsKUZeMpOrgV7NDxOkoO7tJ"
-	, "expiration" : "36000"
+	, "expiration" : 36000
     ,"db" : {
 		"port" : ":27017"
 		, "name" :""
