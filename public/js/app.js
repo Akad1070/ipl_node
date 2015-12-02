@@ -75,13 +75,13 @@ $(function() {
 
 
 
-	// Send any form
-	$('#send').click(function (e) {
-		e.preventDefault();
-		var inputs = $('form > input');
-		console.log(inputs);
-		e.preventDefault();
-	});
+	// // Send any form
+	// $('#send').click(function (e) {
+	// 	e.preventDefault();
+	// 	var inputs = $('form > input');
+	// 	console.log(inputs);
+	// 	e.preventDefault();
+	// });
 
 
 
