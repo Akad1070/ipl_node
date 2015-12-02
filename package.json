@@ -17,7 +17,7 @@
   "scripts" : {
     "test"     : "echo \"Error: no test specified\" && exit 1",
     "start"    : "set NODE_ENV=prod&&node music.js",
-    "start_dev": "set NODE_ENV=dev&&node music.js",
+    "start_dev": "set NODE_ENV=dev&&node music.js"
   },
   "author" : "Ko1l",
   "license": "MIT"
