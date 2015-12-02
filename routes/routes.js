@@ -163,8 +163,7 @@ var loginPosted = function (req,res,next) {
 		}
 		if(user){	// Generate the token  & save it into the REDIS user
 			logger.info(msg);
-			res.status(200);
-			res.send(user.token);
+			return res.status(200).send(user.token);
 		}
 	});
 };

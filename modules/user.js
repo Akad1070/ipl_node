@@ -91,7 +91,7 @@ var login = function (pseudo,pass,cb){
 		// If the 2 password !=
 		bcrypt.compare(pass, dbUser.passwd, function(err, isMatch) {
     		if (err)
-    			if(cb) return cb(new Error("[User] The password for "+ pseudo +" is required."));
+    			if(cb) return cb(new Error("[User] Error while checking the password for "+ pseudo));
 
 			if(!isMatch)
 				if(cb) return cb(new Error("[User] The password for "+ pseudo +" is incorrect"));
