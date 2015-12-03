@@ -7,8 +7,7 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 
 	var reqAjax =  $.ajax({
 			headers: {
-				'Accept' : 'text/javascript; charset=utf-8'
-				, 'api-token' : sessionStorage.getItem('token')
+				'api-token' : sessionStorage.getItem('token')
 			}
 			,url  : _url
 			,method : _method || 'GET'
@@ -18,7 +17,7 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 
 	if(cbDone)
 		reqAjax.done(function (data) {
-			setFlash('', 'error');
+			setFlash('', 'success');
 			cbDone(data);
 		});
 	if(cbFail)
@@ -93,7 +92,7 @@ $(function() {
 				,function (datas) {
 					var list = $('#listing');
 					list.append('<h2>All ziks added</h2>');
-					list.append(datas)
+					list.append(datas);
 				}
 				, function(data) {	console.log('Error Index : '+data);	}
 			);
@@ -139,7 +138,7 @@ $(function() {
 				    window.location.href = '/'; // Redirect to the homePage
 				}
 			);
-			break
+			break;
 
 		case '/signup' :
 

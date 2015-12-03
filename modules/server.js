@@ -80,12 +80,15 @@ var _configureServer = function () {
 
 
 	// Init the mongoDB by connectin to
+	//var url = 'mongodb://'+process.env.IP+port+'/'+dbname;
+    var url = process.env.DB_MONGO_URL;
 	mongo.connect(config.db.port,config.db.name, function (err,db,msg) {
 		return ((err) ? logger.error(err.message) : logger.info(msg) );
 	});
 
 
 	// Init the connection to Redis
+	url = process.env.DB_REDIS_URL;
 	redis.connect(null,null, function(err,msg) {
 	    return ((err) ? logger.error(err.message) : logger.info(msg) );
 	});
