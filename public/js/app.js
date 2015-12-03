@@ -29,6 +29,11 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 	return reqAjax;
 }
 
+
+/**
+ * Send a flashh message showed on the top of the page.
+ * Styled based on his status {error,info,success,warm}
+ */
 function setFlash(msg, status) {
 	$('.flash').remove();
 	$('body').prepend('<div class="flash '+status+'"><span>' + msg + '</span></div>');
