@@ -225,7 +225,6 @@ var stop = function (callback) {
  */
 
 // Methods
-exports = {
-	start = start,
-	stop = stop
-};
+
+exports.start = start;
+exports.stop = stop;
