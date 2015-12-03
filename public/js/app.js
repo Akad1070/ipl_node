@@ -75,13 +75,6 @@ $(function() {
 
 
 
-	// // Send any form
-	// $('#send').click(function (e) {
-	// 	e.preventDefault();
-	// 	var inputs = $('form > input');
-	// 	console.log(inputs);
-	// 	e.preventDefault();
-	// });
 
 
 
@@ -104,6 +97,17 @@ $(function() {
 				}
 				, function(data) {	console.log('Error Index : '+data);	}
 			);
+
+			// Send any form
+			 $('form').submit(function (e) {
+			 	var inputs = this;
+			 	console.log(inputs);
+			 	e.preventDefault();
+			 });
+
+
+
+
 		break;
 
 		case '/login' :

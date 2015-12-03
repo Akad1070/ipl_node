@@ -150,7 +150,7 @@ var signupPosted = function (req,res,next) {
 
 var login = function (req,res,next) {
 	res.render('login',{title: "Connexion",header : "Log In"});
-	return next();
+	//return next();
  };
 
 

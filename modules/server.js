@@ -106,7 +106,7 @@ var _configureRoutes = function () {
 
 	app.route('/login')
 			.get(defRoute.login)
-			.post(defRoute.loginPosted/*, defRoute.home*/);
+			.post(defRoute.loginPosted, defRoute.home);
 
 	app.get('/logout',defRoute.logout, defRoute.home);
 

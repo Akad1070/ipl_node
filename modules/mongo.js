@@ -53,7 +53,7 @@ var _mongoClient = require('mongodb').MongoClient;
  */
 var connect = function (port,dbname,cb) {
     //var url = 'mongodb://'+process.env.IP+port+'/'+dbname;
-    var url = process.env.DB_JER_MONGO_URL;
+    var url = process.env.DB_MONGO_URL;
     _mongoClient.connect(url, function(err, mongodb) {
         if(err)
             if(cb) return cb(new Error("[Mongo DB] Error on Connecting to "+url +" : " + err.message));

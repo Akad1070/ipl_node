@@ -125,6 +125,8 @@ var genToken = function (dbUser) {
 	});
 
 	userDAO.insertVal('token+'+dbUser.pseudo,token,function (err,msg){
+		if(err)
+			return err.message;
 		//userDAO.expiresIn('token+'+dbUser.pseudo,config.expiration);
 		return token;
 	});
