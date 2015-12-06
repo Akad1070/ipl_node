@@ -1,0 +1,4 @@
+=== damp-shore-5268 Config Vars
+DB_MONGO_URL:     mongodb://heroku:heroku@ds061354.mongolab.com:61354/nodezik
+DB_REDIS_URL:     redis://redistogo:03d3f80824b025193f39092e3c80e743@tarpon.redistogo.com:9441/
+NODE_ENV:         prod

@@ -5,12 +5,16 @@
 	, "secretkey" : "9ibzsKUZeMpOrgV7NDxOkoO7tJ"
 	, "expiration" : 36000
     ,"db" : {
-		"port" : ":27017"
-		, "name" :""
-
+    	"mongo" : {
+    		"port" : "27017",
+    		"dbname" :"test"
+			,"collections" : {
+				"musics" : "musics"
+			}
+    	}
+    	, "redis" : {
+    		"port" : ":6379",
+    		"dbname" :""
+    	}
     }
-	, "collections" : {
-		"musics" : "musics"
-
-	}
 }

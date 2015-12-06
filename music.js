@@ -1,4 +1,9 @@
 
+/*jslint node:true, vars:true, bitwise:true, unparam:true */
+/*jshint unused:true */
+// Leave the above lines for propper jshinting
+//Type Node.js Here :)
+"use strict";
 
 /**
  * =============================
@@ -37,5 +42,20 @@ process.chdir(__dirname);
 config.init('config.json');
 
 config.load(function () {
-    server.start();
+
+    server.start(function (err){
+        if(err) process.kill(process.pid, 'SIGTERM');
+    });
 });
+
+var exitMusic = function () {
+  server.stop(function () {
+    process.exit(0);
+  });
+};
+
+// If Exception 
+process.on('uncaughtException', exitMusic);
+// If ctrl+c
+process.on('SIGTERM', exitMusic);
+

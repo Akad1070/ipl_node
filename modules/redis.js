@@ -38,18 +38,24 @@ var _client ;
 /**
  * Connect to redis
  * @param {String} port Port for the database
- * @param {String} host IP of the db
+ * @param {String} Name of the db
  * @param {Function} cb The function called after connected or not.
  */
-var connect = function (port,host,cb) {
-    _client = redis.createClient(process.env.DB_REDIS_URL);
+var connect = function (port,cb) {
+    var url = process.env.DB_REDIS_URL || 'redis://'+process.env.IP+':'+port;
+    _client = redis.createClient(url);
     _client.on('connect',function(err) {
         if(err)
             if(cb) return cb(new Error('[Redis] Error on connecting the client'));
-        if(cb) return cb(null,'[Redis DB] Connected ');
+        if(cb) return cb(null,'[Redis DB] Connected on '+url);
     });
 };
 
+
+var disconnect = function () {
+    if(_client)
+        _client.quit;
+};
 
 
 var insert = function (key,val,cb) {
@@ -141,6 +147,7 @@ var del = function (key,cb) {
 // Methods
 exports.client              = _client;
 exports.connect             = connect;
+exports.stop                = disconnect;
 
 exports.contains            = contains;
 exports.delete              = del;

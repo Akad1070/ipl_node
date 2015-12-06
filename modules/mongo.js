@@ -52,8 +52,7 @@ var _mongoClient = require('mongodb').MongoClient;
  * @return  The database object in the cb;
  */
 var connect = function (port,dbname,cb) {
-    //var url = 'mongodb://'+process.env.IP+port+'/'+dbname;
-    var url = process.env.DB_MONGO_URL;
+    var url = process.env.DB_MONGO_URL || 'mongodb://'+process.env.IP+':'+port+'/'+dbname;
     _mongoClient.connect(url, function(err, mongodb) {
         if(err)
             if(cb) return cb(new Error("[Mongo DB] Error on Connecting to "+url +" : " + err.message));
@@ -68,7 +67,8 @@ var connect = function (port,dbname,cb) {
  * Called to stop the connection to the db.
  */
 var stop = function (){
-    _db.close();
+    if(_db && typeof _db.close === 'function')
+        _db.close();
 };
 
 

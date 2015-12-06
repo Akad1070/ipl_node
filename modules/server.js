@@ -1,3 +1,4 @@
+"use strict";
 
 /**
  * =============================
@@ -56,7 +57,7 @@ var server;
  * Configure application:
  *		- parse json bodies
  */
-var _configureServer = function () {
+var _configureServer = function (callback) {
 	// Parse JSON bodies
 	app.use(bodyParser.json());
 
@@ -79,18 +80,20 @@ var _configureServer = function () {
 
 
 
-	// Init the mongoDB by connectin to
+	// Init the mongoDB by connecting to
 	//var url = 'mongodb://'+process.env.IP+port+'/'+dbname;
-    var url = process.env.DB_MONGO_URL;
-	mongo.connect(config.db.port,config.db.name, function (err,db,msg) {
-		return ((err) ? logger.error(err.message) : logger.info(msg) );
-	});
+	mongo.connect(config.db.mongo.port,config.db.mongo.dbname, function (err,db,msg) {
+		if(err) 
+	    	return (callback) ? callback(err) : null;
+		return (callback) ? callback(null,msg) : null;
+    });
 
 
 	// Init the connection to Redis
-	url = process.env.DB_REDIS_URL;
-	redis.connect(null,null, function(err,msg) {
-	    return ((err) ? logger.error(err.message) : logger.info(msg) );
+	redis.connect(config.db.mongo.port, function(err,msg) {
+		if(err) 
+	    	return (callback) ? callback(err) : null;
+		return (callback) ? callback(null,msg) : null;
 	});
 
 };
@@ -188,11 +191,19 @@ var _configureRoutes = function () {
  * @param callback function called when the web server is listening
  */
 var start = function (callback) {
-	_configureServer();
-	_configureRoutes();
-	server = app.listen(process.env.PORT || 8080, config.server.host, function () {
-		logger.info('[Server] Web server listening on ' + config.server.host + ':' + process.env.PORT);
-		if (callback) callback();
+	// Try to config the server
+	_configureServer(function (err,msg){
+		if(err) { // If any errors occurs, log it and callback
+	    	logger.error(err.message);
+	    	return (callback) ? callback(err) : null;
+		}
+
+    	logger.info(msg);		// Log all info aout the config 
+		_configureRoutes(); 	// Config the routes
+		server = app.listen(process.env.PORT || 8080, config.server.host, function () {
+			logger.info('[Server] Web server listening on ' + config.server.host + ':' + process.env.PORT || 8080);
+			if (callback) callback();
+		});
 	});
 };
 
@@ -204,11 +215,11 @@ var stop = function (callback) {
 	if (server && typeof server.close == 'function') {
 		server.close();
 		mongo.stop();
-		redis.client.quit();
+		redis.stop();
 		logger.warn('[Server] Web server no more listening on ' + config.server.host + ':' + process.env.PORT);
 		if (callback) callback();
 	} else {
-		logger.warn('[Server] Cannot stop web server listening on ' + config.server.host + ':' + process.env.PORT);
+		logger.warn('[Server] Cannot stop web server not yet init. listening on ' + config.server.host + ':' + process.env.PORT);
 		if (callback) callback();
 	}
 };
