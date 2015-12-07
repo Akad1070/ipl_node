@@ -83,18 +83,6 @@ var serverError = function (err, req, res, next){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  *
  * Route methods
@@ -166,11 +154,6 @@ var loginPosted = function (req,res,next) {
 	});
 };
 
-var logout = function (req,res,next) {
-	User.logout();
-	return next();
-};
-
 
 
 
@@ -220,6 +203,5 @@ exports.signup			= signup;
 exports.signupPosted	= signupPosted;
 
 exports.login          	= login;
-exports.logout          = logout;
 exports.loginPosted    	= loginPosted;
 

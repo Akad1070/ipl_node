@@ -130,7 +130,9 @@ form textarea {
 }
 
 
-
+.hidden{
+	display: none;
+}
 
 
 

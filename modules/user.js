@@ -81,7 +81,7 @@ var signup = function (user,cb) {
  * @param {Function} cb Callback Function called when the user details is incorrect
  */
 var login = function (pseudo,pass,cb){
-	// console.log('Pseudo : ',pseudo);
+	console.log('Pseudo : ',pseudo);
 	userDAO.get(pseudo, function (err,dbUser) {
 		if(err)	if(cb) return cb(err);
 
@@ -106,10 +106,6 @@ var login = function (pseudo,pass,cb){
 			});
 		});
 	});
-};
-
-var logout = function () {
-
 };
 
 /**
@@ -236,7 +232,6 @@ var delZik = function (title,cb) {
 // Methods realeted to Login
 exports.signup            = signup;
 exports.login             = login;
-exports.logout            = logout;
 exports.genToken          = genToken;
 exports.checkToken        = checkUserToken;
 

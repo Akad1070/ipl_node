@@ -116,8 +116,6 @@ var _configureRoutes = function () {
 			.get(defRoute.login)
 			.post(defRoute.loginPosted, defRoute.home);
 
-	app.get('/logout',defRoute.logout, defRoute.home);
-
 	app.route('/signup')
 			.get(defRoute.signup)
 			.post(defRoute.signupPosted, defRoute.home);
