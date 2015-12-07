@@ -134,9 +134,13 @@ $(function() {
 	$('a').click(function(e) {
 		e.preventDefault();
 		var url = e.target.getAttribute("href");
-		if(url === '/logout'){
-			logMeOut();
+		if('/' === url){
+			window.location.replace('/');
+			return;
 		}
+		if(url === '/logout')
+			return logMeOut();
+
 		console.log('Click on some link : %s',url);
 		launchAjaxRequest(url,null,null
 			,function(datas,status) {

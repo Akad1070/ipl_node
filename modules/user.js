@@ -84,9 +84,9 @@ var login = function (pseudo,pass,cb){
 	userDAO.get(pseudo, function (err,dbUser) {
 		if(err)	if(cb) return cb(err);
 	
-		console.log('Pseudo : ',pseudo);
+		console.log('[User] Pseudo : %s',pseudo);
 
-		if(pseudo !== dbUser.pseudo)
+		if(!dbUser || pseudo !== dbUser.pseudo)
 			if(cb) return cb(new Error("[User] This user "+ pseudo +" doesn't exists in our system.<br>"));
 
 		// If the 2 password !=
@@ -97,6 +97,7 @@ var login = function (pseudo,pass,cb){
 			if(!isMatch)
 				if(cb) return cb(new Error("[User] The password for "+ pseudo +" is incorrect"));
 
+			
 			// Get the user in REDiS
 			userDAO.getVal('token+'+dbUser.pseudo,function (err, token) {
 			    if(err || !token)

@@ -212,9 +212,9 @@ var start = function (callback) {
  */
 var stop = function (callback) {
 	if (server && typeof server.close == 'function') {
-		server.close();
 		mongo.stop();
 		redis.stop();
+		server.close();
 		logger.warn('[Server] Web server no more listening on ' + config.server.host + ':' + process.env.PORT);
 		if (callback) callback();
 	} else {
