@@ -81,9 +81,10 @@ var signup = function (user,cb) {
  * @param {Function} cb Callback Function called when the user details is incorrect
  */
 var login = function (pseudo,pass,cb){
-	console.log('Pseudo : ',pseudo);
 	userDAO.get(pseudo, function (err,dbUser) {
 		if(err)	if(cb) return cb(err);
+	
+		console.log('Pseudo : ',pseudo);
 
 		if(pseudo !== dbUser.pseudo)
 			if(cb) return cb(new Error("[User] This user "+ pseudo +" doesn't exists in our system.<br>"));

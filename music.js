@@ -39,16 +39,15 @@ var server = require('./modules/server.js');
 process.chdir(__dirname);
 
 
+
+/*
 config.init('config.json');
-
 config.load(function () {
-
     server.start(function (err){
         // if(err) process.kill(process.pid, 'SIGTERM');
         if(err) process.exit(0);;
     });
 });
-
 
 var exitMusic = function () {
   server.stop(function () {
@@ -57,9 +56,20 @@ var exitMusic = function () {
 };
 
 
-
 // If Exception 
 process.on('uncaughtException', exitMusic);
 // If ctrl+c
 process.on('SIGTERM', exitMusic);
+
+*/
+
+
+
+config.init('config.json');
+
+config.load(function () {
+    server.start();
+});
+
+
 
