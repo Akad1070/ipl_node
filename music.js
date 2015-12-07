@@ -44,18 +44,21 @@ config.init('config.json');
 config.load(function () {
 
     server.start(function (err){
-        if(err) process.kill(process.pid, 'SIGTERM');
+        //if(err) process.kill(process.pid, 'SIGTERM');
     });
 });
 
+/*
 var exitMusic = function () {
   server.stop(function () {
-    process.exit(0);
+    //process.exit(0);
   });
 };
 
+*/
+
 // If Exception 
-process.on('uncaughtException', exitMusic);
+//process.on('uncaughtException', exitMusic);
 // If ctrl+c
-process.on('SIGTERM', exitMusic);
+//process.on('SIGTERM', exitMusic);
 

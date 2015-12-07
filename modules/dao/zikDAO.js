@@ -46,7 +46,7 @@ var mongo	   = require('../mongo');
  *  Otherwise, upsert with the nObj.
  */
 var add = function (selectObj,nObj,cb) {
-	mongo.getCollection(config.collections.musics, function (err,docZiks) {
+	mongo.getCollection(config.db.mongo.collections.musics, function (err,docZiks) {
 		if(err)
 			if(cb) return cb(err);
 
@@ -66,7 +66,7 @@ var add = function (selectObj,nObj,cb) {
  * @param {Function}    cb      Callback Function
  */
 var listBy = function (obj,cb) {
-	mongo.getCollection(config.collections.musics, function (err,collects){
+	mongo.getCollection(config.db.mongo.collections.musics, function (err,collects){
 		if(err)
 			if(cb) return cb(err);
 
@@ -88,7 +88,7 @@ var listBy = function (obj,cb) {
  * @param {Function}    cb  Callback Function
  */
 var listnSortByField = function (obj,cb) {
-	mongo.getCollection(config.collections.musics , function (err,docZiks){
+	mongo.getCollection(config.db.mongo.collections.musics , function (err,docZiks){
 		if(err)	return ( (cb) ? cb(err) : null);
 		mongo.selectAll(docZiks,{},obj,function (err, docs) {
 			var val = Object.keys(obj['fields'])[0]  || 'all';
@@ -108,7 +108,7 @@ var listnSortByField = function (obj,cb) {
  * @param {Function}    cb      Callback Function
  */
 var getZikBy = function (obj,cb) {
-	mongo.getCollection(config.collections.musics , function (err,docZiks){
+	mongo.getCollection(config.db.mongo.collections.musics , function (err,docZiks){
 		if(err) return ( (cb) ? cb(err) : null);
 		/*
 		docZiks.find(obj).limit(1).toArray(function (err, doc) {
@@ -132,7 +132,7 @@ var getZikBy = function (obj,cb) {
 
 
 var maj = function  (oldTitle,obj,cb) {
-	mongo.getCollection(config.collections.musics, function (err,docZiks,msg) {
+	mongo.getCollection(config.db.mongo.collections.musics, function (err,docZiks,msg) {
 		if(err) return ( (cb) ? cb(err) : null);
 
 		mongo.update(docZiks,oldTitle,obj,function (err, doc) {
@@ -148,7 +148,7 @@ var maj = function  (oldTitle,obj,cb) {
 
 
 var del = function (title,cb) {
-	mongo.getCollection(config.collections.musics, function (err,docZiks) {
+	mongo.getCollection(config.db.mongo.collections.musics, function (err,docZiks) {
 		if(err) return ( (cb) ? cb(err) : null);
 
 		mongo.delete(docZiks,title,function (err,msg) {

@@ -29,7 +29,7 @@ var addPosted = function (req,res,next){
 			logger.warn(err.message);
 			res.status(401);
 		}else{
-			logger.info('[DAO] DB Insertion of '+req.body.title);
+			logger.info('[ZikDAO] DB Insertion of '+req.body.title);
 			res.status(200);
 		}
 		req.params['field'] = 'title'; req.params['val'] = req.body.title;
@@ -37,6 +37,34 @@ var addPosted = function (req,res,next){
 	});
 
 };
+
+
+var checkField = function (req,res,next,field) {
+	console.log('Check first the field ');
+	next();
+}
+
+
+
+/**
+ * Check if the title provided in the URL is correct.
+ * 
+ */
+var checkTitle = function (req,res,next,title) {
+	User.getZik('title',title, function (err,zik,msg) {
+		// If err throwned or zik is not founded
+		if(err || !zik) {
+			err.status(404);
+			return next(err || msg);
+		}
+		logger.info('[ZikDAO] '+msg);
+		req.zik = zik;
+		return next();
+	});
+};
+
+
+
 
 
 /**
@@ -166,24 +194,14 @@ var majZik = function (req,res,next) {
 		});
 	}
 
-	User.getZik('title', req.params.title, function (err,data,msg) {
-		if(err){
-			logger.warn(err.message);
-			res.status(404);
-		}else{
-			logger.info('[ZikDao] '+msg);
-			res.status(200);
-		}
 		//console.log(data);
-		res.render('zik/update',
-			{
-				title : 'Updating '+req.params.title
-				,header : 'Updating \''+req.params.title+'\''
-				,zik : data
-
-			});
-		res.end();
+	res.render('zik/update',
+		{
+			title : 'Updating '+req.params.title
+			,header : 'Updating \''+req.params.title+'\''
+			,zik : req.zik
 	});
+	res.end();
 
 
 };
@@ -282,6 +300,8 @@ var delZikPosted = function (req,res,next) {
  */
 
 // Methods
+
+exports.checkParamTitle	= checkTitle;
 
 exports.add        		= add;
 exports.addPosted		= addPosted;

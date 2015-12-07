@@ -127,7 +127,10 @@ $(function() {
 							window.location.href = '/'; // Redirect to the homePage
 						}
 						,function (data){
-							console.log(data.responseText);
+							if(data.responseText === 'TokenExpiredError'){
+								setFlash('Your session has expires. Please login again to continue', 'error');
+								//window.location.href = '/login';
+							}
 					});
 				}else{
 					console.log("The session Storage is not supported ! Please active JavaScript to use it");

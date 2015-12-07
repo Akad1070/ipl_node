@@ -90,7 +90,7 @@ var _configureServer = function (callback) {
 
 
 	// Init the connection to Redis
-	redis.connect(config.db.mongo.port, function(err,msg) {
+	redis.connect(config.db.redis.port, function(err,msg) {
 		if(err) 
 	    	return (callback) ? callback(err) : null;
 		return (callback) ? callback(null,msg) : null;
@@ -107,6 +107,8 @@ var _configureRoutes = function () {
 	// Middleware to use before process all requests
 	app.use(defRoute.beforeRequest);
 
+
+	app.param('title',zikRoute.checkParamTitle);
 
 	app.get('/',defRoute.home);
 
@@ -127,7 +129,7 @@ var _configureRoutes = function () {
 	/**
 	 *  Sub-Router handler for /zik
 	 */
-	var appZik = new express.Router();
+	var appZik = express.Router();
 
 	// Auth for all /zik/*
 	appZik.all('/*', defRoute.isAuth);
@@ -159,7 +161,7 @@ var _configureRoutes = function () {
 	 *  Sub-Router handler for /api
 	 */
 
-	var appApi = new express.Router();
+	var appApi = express.Router();
 
 	// Check for the api if token
 	appApi.all('/*', apiRoute.isAuth);
@@ -197,10 +199,10 @@ var start = function (callback) {
 	    	logger.error(err.message);
 	    	return (callback) ? callback(err) : null;
 		}
-
-    	logger.info(msg);		// Log all info aout the config 
+    	logger.info(msg);		// Log all info about the config 
 		_configureRoutes(); 	// Config the routes
-		server = app.listen(process.env.PORT || 8080, config.server.host, function () {
+		server = app.listen(process.env.PORT || 8080, config.server.host, function (err) {
+			console.log(err);
 			logger.info('[Server] Web server listening on ' + config.server.host + ':' + process.env.PORT || 8080);
 			if (callback) callback();
 		});

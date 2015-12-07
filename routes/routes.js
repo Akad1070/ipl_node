@@ -65,18 +65,17 @@ var notFound = function (req, res){
 
 var serverError = function (err, req, res, next){
 	// log error:
-
-	logger.log('[Server] ' + (err.status != 500) ? err :err.stack);
+	logger.warn('[Server] ' + (err.status != 500) ? err.message : err.stack);
 
 	// send output based on type of request json vs html
 	var accept = req.headers.accept || '';
-
 	if (~accept.indexOf('json')) {
 		res.json({ error: "There was a server error :(" }, err.status || 500);
   	}else{
 		res.render('errors/500', {
-			status: err.status || 500,
-			locals: { title: '500 Internal ServerError :( ' }
+			msg : err.message,
+			locals: { title: '500 Internal ServerError :( ' },
+			status: err.status || 500
 	  });
 	}
 };
@@ -157,9 +156,8 @@ var login = function (req,res,next) {
 var loginPosted = function (req,res,next) {
 	User.login(req.body.pseudo,req.body.passwd, function (err,user,msg) {
 		if(err){
-			logger.warn(err.message);
-			res.status(401);
-			return res.send(err.message);
+      		err.status = 404;
+      		return next(err);
 		}
 		if(user){	// Generate the token  & save it into the REDIS user
 			logger.info(msg);
@@ -184,8 +182,8 @@ var isAuth = function (req,res,next) {
 		if(err){
 			// Sending a 401 will require authentication,
 			logger.warn('[Server] Authentification Failed : '+err.message);
-			res.status(401);
-			return res.send(err.name);
+			err.status(401);
+			return next(err);
 		}
 		logger.warn('[Server] Authorization for : ');
 		//res.status(200).send('Hi '+"LePseudo"+', You look at my protected page :-) !');
