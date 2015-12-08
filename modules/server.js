@@ -57,7 +57,7 @@ var server;
  * Configure application:
  *		- parse json bodies
  */
-var _configureServer = function (callback) {
+var _configureServer = function (cb) {
 	// Parse JSON bodies
 	app.use(bodyParser.json());
 
@@ -83,17 +83,15 @@ var _configureServer = function (callback) {
 	// Init the mongoDB by connecting to
 	//var url = 'mongodb://'+process.env.IP+port+'/'+dbname;
 	mongo.connect(config.db.mongo.port,config.db.mongo.dbname, function (err,db,msg) {
-		if(err) 
-	    	return (callback) ? callback(err) : null;
-		return (callback) ? callback(null,msg) : null;
+		if(err && cb) return cb(err);
+		if(cb)  return cb(null,msg);
     });
 
 
 	// Init the connection to Redis
 	redis.connect(config.db.redis.port, function(err,msg) {
-		if(err) 
-	    	return (callback) ? callback(err) : null;
-		return (callback) ? callback(null,msg) : null;
+		if(err && cb) return cb(err);
+		if(cb)  return cb(null,msg);
 	});
 
 };
@@ -195,14 +193,18 @@ var start = function (callback) {
 	_configureServer(function (err,msg){
 		if(err) { // If any errors occurs, log it and callback
 	    	logger.error(err.message);
-	    	return (callback) ? callback(err) : null;
+	    	if (callback) return callback(err);
 		}
     	logger.info(msg);		// Log all info about the config 
 		_configureRoutes(); 	// Config the routes
-		server = app.listen(process.env.PORT || 8080, config.server.host, function () {
-			logger.info('[Server] Web server listening on ' + config.server.host + ':' + process.env.PORT || 8080);
-			if (callback) callback();
-		});
+
+		// Only if the server isn't already listenning
+		if(!server){
+			server = app.listen(process.env.PORT || 8080, process.env.IP || config.server.host, function () {
+				logger.info('[Server] Web server listening on ' + config.server.host + ':' + process.env.PORT || 8080);
+				if (callback) return callback();
+			});
+		}
 	});
 };
 

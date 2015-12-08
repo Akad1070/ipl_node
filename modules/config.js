@@ -39,12 +39,12 @@ var logger = require('./logger.js');
  * Variables
  */
 
-// An array of files that will be used to find the bootstrap.properties file
+// An array of files that will be used to find the config file
 var file ;
 
 
 /**
- * Set the filenamestouse in config
+ * Set the filenames  in config
  *
  */
 var init = function (filename,cb) {
@@ -63,23 +63,20 @@ var load = function (cb) {
 	logger.info('[Config] Start loading config file: ' + file);
 	// Read file content
 	fs.readFile(file, function (err, data) {
-		if (err) {
 		// If an error occured
-			if (cb) cb(new Error('[Config] Unable to read the config file ' + file + ': ' + err.message));
-		}	else {
-		// If file read
-			try {
-				// Populate config
-				var parsedConfig = JSON.parse(data);
-				for (var key in parsedConfig) {
-					exports[key] = parsedConfig[key];
-				}
-				// Done
-				logger.info('[Config] Config file ' + file + ' loaded');
-				if (cb) cb(null);
-			} catch (err) {
-				if (cb) cb(new Error('[Config] Unable to parse the config file ' + file + ': ' + err.message));
+		if (err && cb) return cb(new Error('[Config] Unable to read the config file ' + file + ': ' + err.message));
+		try {
+			// If file read
+			// Populate config
+			var parsedConfig = JSON.parse(data);
+			for (var key in parsedConfig) {
+				exports[key] = parsedConfig[key];
 			}
+			// Done
+			logger.info('[Config] Config file ' + file + ' loaded');
+			if (cb) return cb(null);
+		} catch (err) {
+			if (cb) cb(new Error('[Config] Unable to parse the config file ' + file + ': ' + err.message));
 		}
 	});
 };

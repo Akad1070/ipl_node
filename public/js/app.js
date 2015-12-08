@@ -103,11 +103,13 @@ $(function() {
 					launchAjaxRequest('/login','POST',{'pseudo' :pseudo ,'passwd' : passwd},
 						function (data,status){ // If the AJAX Request is okay ( Status : 200)
 							console.log("Token de %s  ==> %s",pseudo,data);
-							sessionStorage.setItem('token',data); // SAve the token in the sessionStorage
-							$loginPanel.addClass('hidden'); // Hide the login div
-							listing('/ziks/by/title',function (){	// GET All ziks for the homepage
-								$listingPanel.prepend('<h2>All ziks added</h2>');
-							});
+							if(data){
+								sessionStorage.setItem('token',data); // SAve the token in the sessionStorage
+								$loginPanel.addClass('hidden'); // Hide the login div
+								listing('/ziks/by/title',function (){	// GET All ziks for the homepage
+									$listingPanel.prepend('<h2>All ziks added</h2>');
+								});
+							}
 						}
 						,function (data){
 							if(data.responseText === 'TokenExpiredError'){

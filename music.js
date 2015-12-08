@@ -51,25 +51,34 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1;
 //  of the file (__dirname) being executed.
 process.chdir(__dirname);
 
-
-// Handle the cluster
-throng(server.start, {
+/*
+//  Handle the cluster
+throng(config.load, {
   workers: WORKERS,
   lifetime: Infinity // Minimum time to keep the Cluster alive
 });
+*/
 
-
+//  Set the file name for the config
 config.init('config.json');
 
-config.load(function () {
-    server.start(function () {
-        process.on('SIGTERM', exitMusic); // // If ctrl+c
-        process.on('uncaughtException', exitMusic); // // If Exception 
+//  Launch the config's loading 
+config.load(function (err) {
+  if(err) exitMusic();
+  //  Callback to start the server
+    server.start(function (err) {
+      if(err) exitMusic();
     });
 });
 
 var exitMusic = function () {
   server.stop(function () {
-    process.exit(0);
+    return process.kill(process.pid,'SIGTERM');
   });
 };
+
+// If ctrl+c
+process.on('SIGINT', exitMusic); 
+process.on('SIGTERM', exitMusic); 
+// If Exception 
+process.on('uncaughtException', exitMusic);
