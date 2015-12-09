@@ -73,7 +73,7 @@ config.load(function (err) {
 
 var exitMusic = function () {
   server.stop(function () {
-    return process.kill(process.pid,'SIGTERM');
+    return process.exit();
   });
 };
 

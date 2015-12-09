@@ -48,7 +48,7 @@ var checkErrorProd = function(err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('/error', {
 		header: err.message,
-		msg: {}
+		msg: err
 	});
 };
 
@@ -92,7 +92,7 @@ var serverError = function (err, req, res, next){
 
 var home = function (req,res,next) {
 	res.status(200);
-	res.render('home',{title : "Home",header : "Welcome to NodeZikApp"});
+	res.render('home',{header : "Welcome to NodeZikApp"});
 	//return next();
  };
 
@@ -101,33 +101,31 @@ var home = function (req,res,next) {
 
 var signup = function (req,res,next) {
 	res.render('signup',{title: "SignUp",header : "Sign Up"});
-	return next();
 };
 
 
 
 var signupPosted = function (req,res,next) {
-	var isNotSet = false, msg = null;
+	var msg = null;
 	if(!(req.body && req.body.pseudo && req.body.passwd && req.body.passwd2)){
-		isNotSet = true; msg = '[User] One field is not set for the signup form';
+		msg = 'One of the fields is not defined for the signup';
 	}else{
-		if(req.body.passwd !== req.body.passwd2){
-			isNotSet = true; msg = '[User] The 2 passwords doesn\'t match';
-		}
+		if(req.body.passwd !== req.body.passwd2)
+			msg = 'The 2 passwords doesn\'t match';
 	}
-	if(isNotSet){
-		logger.warn(msg);
+	if(msg){
+		logger.warn('[User] '+msg);
 		return res.status(404).render('signup',{msg : msg});
 	}
 	User.signup(req.body, function (err,msg) {
 		if(err){
-			logger.warn(err.message);
+			logger.warn('[User] '+ (msg = err.message));
 			res.status(404);
-			return res.render('signup',{msg : err.message});
+		}else{
+			logger.info('[User] '+msg);
+			res.status(200);
 		}
-		logger.info('[User] '+msg);
-		res.status(200);
-		return next();
+		res.send(msg);
 	});
 };
 
@@ -142,14 +140,14 @@ var login = function (req,res,next) {
 
 
 var loginPosted = function (req,res,next) {
-	User.login(req.body.pseudo,req.body.passwd, function (err,user,msg) {
+	User.login(req.body.pseudo,req.body.passwd, function (err,token,msg) {
 		if(err){
-      		err.status = 404;
-      		return next(err);
+			logger.warn(err.message);
+      		return res.status(401).send(err.message);
 		}
-		if(user){	// Generate the token  & save it into the REDIS user
+		if(token){	// Generate the token
 			logger.info(msg);
-			return res.status(200).send(user.token);
+			return res.status(200).send(token);
 		}
 	});
 };
@@ -165,10 +163,9 @@ var isAuth = function (req,res,next) {
 		if(err){
 			// Sending a 401 will require authentication,
 			logger.warn('[Server] Authentification Failed : '+err.message);
-			err.status(401);
-			return next(err);
+			return res.status(401).send(err);
 		}
-		logger.warn('[Server] Authorization for : ');
+		logger.info('[Server] Authorized');
 		//res.status(200).send('Hi '+"LePseudo"+', You look at my protected page :-) !');
 		return next();
 	});

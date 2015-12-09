@@ -105,52 +105,52 @@ var _configureRoutes = function () {
 	// Middleware to use before process all requests
 	app.use(defRoute.beforeRequest);
 
-
-	app.param('title',zikRoute.checkParamTitle);
-
 	app.get('/',defRoute.home);
 
 	app.route('/login')
 			.get(defRoute.login)
-			.post(defRoute.loginPosted, defRoute.home);
+			.post(defRoute.loginPosted);
 
 	app.route('/signup')
 			.get(defRoute.signup)
-			.post(defRoute.signupPosted, defRoute.home);
+			.post(defRoute.signupPosted);
 
 	app.get('/stop',stop);
 
 
 
 	/**
-	 *  Sub-Router handler for /zik
+	 *  Sub-Router handler for /ziks
 	 */
-	var appZik = express.Router();
+	var appZiks = express.Router();
 
 	// Auth for all /zik/*
-	appZik.all('/*', defRoute.isAuth);
+	appZiks.all('/*', defRoute.isAuth);
+	
+	appZiks.param('field',zikRoute.checkParamField);
+	appZiks.param('title',zikRoute.checkParamTitle);
 
-	appZik.route('/add')
+	appZiks.route('/add')
 			.get(zikRoute.add)
-			.post(zikRoute.addPosted, zikRoute.listBy);
+			.post(zikRoute.addPosted);
 
-	//		/zik/by/author/desc
-	appZik.get('/by/:field/:sort?', zikRoute.listBy);
+	//		/ziks/by/author/desc
+	appZiks.get('/by/:field/:sort?', zikRoute.listBy);
 
-	appZik.route('/delete/:title')
+	appZiks.route('/delete/:title')
 			.get(zikRoute.del)
 			.post(zikRoute.delPosted, zikRoute.list);
 
-	//		/zik/list/title/Echo
-	appZik.get('/list/:field?/:val?',zikRoute.list);
+	//		/ziks/list/title/Echo
+	appZiks.get('/list/:field?/:val?',zikRoute.list);
 
-	appZik.route('/update/:title')
+	appZiks.route('/update/:title')
 			.get(zikRoute.update)
-			.post(zikRoute.updatePosted, zikRoute.list);
+			.post(zikRoute.updatePosted);
 
-	appZik.get("/:field/:val",zikRoute.get);
+	appZiks.get("/:field/:val",zikRoute.get);
 
-	app.use('/ziks', appZik);
+	app.use('/ziks', appZiks);
 
 
 	/**

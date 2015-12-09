@@ -3,15 +3,15 @@
 
 
 block content
-	form(method='POST')
+	form(method='POST', action='/login')
 		.field
 			label.field-label(for='pseudo') Pseudo
-			input#pseudo.field-input(type='text', name='pseudo', autofocus='')
+			input#pseudo.field-input(type='text', name='pseudo', autofocus='', required='')
 		.field
 			label.field-label(for='pseudo') PassWord
-			input#passwd.field-input(type='password', name='passwd')
+			input#passwd.field-input(type='password', name='passwd', required='')
 		input#send(type='submit', value='Connect')
 	
 	br
 		
-	a(href='/signup') New User
+	a(href='/signup',act='signup') New User

@@ -13,11 +13,11 @@ block content
 		ul
 			each zik in ziks
 				li
-					a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title)= zik.title
+					a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title,act='update')= zik.title
 					|  from &nbsp;
-					a.act(href='/ziks/list/author/'+zik.author, title='List all zik of '+ zik.author)=  zik.author
+					a.act(href='/ziks/list/author/'+zik.author, title='List all zik of '+ zik.author,act='list')=  zik.author
 				li Genre : #{zik.genre}
-				a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title)  Update the details
+				a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title,act='update')  Update the details
 				br
-				a.act(href='/ziks/delete/'+zik.title, title='Delete '+zik.title)  Delete this shit
+				a.act(href='/ziks/delete/'+zik.title, title='Delete '+zik.title,act='delete')  Delete this shit
 		br

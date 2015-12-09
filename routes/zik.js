@@ -1,6 +1,6 @@
 
 /**
- * This API allows to CRUD nothing.
+ * This API allows to CRUD ziks.
  */
 
 
@@ -14,6 +14,11 @@ var logger = require('../modules/logger');
 var User   = require('../modules/user');
 
 
+
+
+var fields = ['author', 'genre', 'album','title','year'];
+
+
 /**
  * Route methods for /Zik
  */
@@ -24,23 +29,26 @@ var add = function (req,res){
 };
 
 var addPosted = function (req,res,next){
-	User.addZik(req.body.title, req.body.author, (req.body.genre || 'Other'), function (err,mess){
+	User.addZik(req.body.title, req.body.author, (req.body.genre || 'Other'), function (err,zik,mess){
 		if(err){
 			logger.warn(err.message);
-			res.status(401);
+			res.status(401).send(err);
 		}else{
 			logger.info('[ZikDAO] DB Insertion of '+req.body.title);
-			res.status(200);
+			res.status(200).send(zik.title);
 		}
-		req.params['field'] = 'title'; req.params['val'] = req.body.title;
-		return next();
+		//req.params['field'] = 'title'; req.params['val'] = req.body.title;
 	});
 
 };
 
 
 var checkField = function (req,res,next,field) {
-	console.log('Check first the field ');
+	if(fields.indexOf(field) < 0){
+		var err = field +" : Unknown field";
+		logger.warn('[Server] '+err);
+		return req.status(404).send(err);
+	}
 	next();
 }
 
@@ -53,9 +61,9 @@ var checkField = function (req,res,next,field) {
 var checkTitle = function (req,res,next,title) {
 	User.getZik('title',title, function (err,zik,msg) {
 		// If err throwned or zik is not founded
-		if(err || !zik) {
-			err.status(404);
-			return next(err || msg);
+		if(err || !zik){
+			logger.warn('[ZikDAO] '+err.message);
+			return req.status(404).send(err);
 		}
 		logger.info('[ZikDAO] '+msg);
 		req.zik = zik;
@@ -102,8 +110,7 @@ var lister = function (req,res,next) {
 			res.status(200);
 		}
 		//console.dir(datas);
-		res.render('zik/display',
-			{
+		res.render('zik/display',{
 			    title  : 'Listing Zik'  ,header: 'Zik Page'
 			    ,msg   : msg
 			    ,type  :req.params.field
@@ -138,8 +145,7 @@ var listerBy = function (req,res,next) {
 			res.status(200);
 		}
 		//console.log(datas);
-		res.render('zik/list',
-			{
+		res.render('zik/list',{
 				title : 'Listing zik by '+req.params.field
 				,header : 'Zik Page'
 				,msg : msg
@@ -170,14 +176,11 @@ var getZik = function (req,res,next) {
 			res.status(200);
 		}
 		//console.log(data);
-		res.render('zik/display',
-			{
+		res.render('zik/display',{
 				title : 'Updating '+req.params.title
 				,header : 'Updating \''+req.params.title+'\''
 				,ziks : data
-
 			});
-		res.end();
 	});
 
 
@@ -195,15 +198,11 @@ var majZik = function (req,res,next) {
 	}
 
 		//console.log(data);
-	res.render('zik/update',
-		{
-			title : 'Updating '+req.params.title
-			,header : 'Updating \''+req.params.title+'\''
-			,zik : req.zik
+	res.render('zik/update',{
+		title : 'Updating '+req.params.title
+		,header : 'Updating \''+req.params.title+'\''
+		,zik : req.zik
 	});
-	res.end();
-
-
 };
 
 
@@ -227,14 +226,13 @@ var majZikPosted = function (req,res,next) {
 		, function (err,data,msg){
 			if(err){
 				logger.warn(err.message);
-				res.status(404);
+				return res.status(404).send(err);
 			}else{
 				logger.info('[ZikDao] '+msg);
-				res.status(200);
+				return res.status(200).send(data);
 			}
-			req.params['field'] = 'title'; req.params['val'] = data.title;
-			return next();
-			//return res.render('update.ejs',{header : 'Updating \''+req.params.title+'\'',zik : data});
+			//req.params['field'] = 'title'; req.params['val'] = data.title;
+			//return res.render('update',{header : 'Updating \''+req.params.title+'\'',zik : data});
 	});
 
 };
@@ -255,7 +253,6 @@ var delZik = function (req,res,next) {
 				,header : 'Deleting \''+req.params.title+'\''
 				,zikTitle : req.params.title
 			});
-		res.end();
 	});
 };
 
@@ -302,6 +299,7 @@ var delZikPosted = function (req,res,next) {
 // Methods
 
 exports.checkParamTitle	= checkTitle;
+exports.checkParamField	= checkField;
 
 exports.add        		= add;
 exports.addPosted		= addPosted;

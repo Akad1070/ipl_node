@@ -1,6 +1,17 @@
-var $listingPanel = $('#listing'),
+var $container = $('.container'),
+	$flashPanel = $('#flashMsg'),
+	$listingPanel = $('#listing'),
 	$loginPanel = $('#login'),
-	$actionPanel = $('actions')	
+	$actionPanel = $('#actions').hide(),
+	anchor = window.location.hash,
+	mapStatusError = {
+	    '400' : "Server understood the request, but request content was invalid.",
+	    '401' : "Unauthorized Access.",
+	    '403' : "Forbidden resource not accessible.",
+	    '500' : "Internal Server Error.",
+	    '503' : "Service Unavailable."
+	};
+
 ;
 
 
@@ -9,8 +20,11 @@ var $listingPanel = $('#listing'),
  */
 function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 	// To notify the use that requeest in executing
-	$('body').prepend('<div class="flash info"><span>Workin..</span></div>');
+	
+	$flashPanel.html('<div class="flash info"><span>Workin..</span></div>');
 
+
+	//setFlash('Test Notif Message','info','Notif title');
 	var reqAjax =  $.ajax({
 			headers: {
 				'api-token' : sessionStorage.getItem('token')
@@ -20,17 +34,15 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 			,data : _data
 	});
 
-
-	if(cbDone)
-		reqAjax.done(function (data,status) {
-			setFlash('', 'success');
-			cbDone(data);
-		});
-	if(cbFail)
-		reqAjax.fail(function (xhr, textStatus, err) {
-			setFlash(xhr.responseText, 'error');
-			cbFail(xhr.responseText);
-		});
+	reqAjax.done(function (data,status) {
+		$flashPanel.fadeOut('slow');
+		if(cbDone)	cbDone(data);
+	});
+	reqAjax.fail(function (xhr, textStatus, err) {
+		var title = mapStatusError[xhr.status] || 'Unknown error';
+		setFlash(xhr.responseText, 'error',title);
+		if(cbFail)	cbFail(xhr.responseJSON);
+	});
 
 	return reqAjax;
 }
@@ -40,39 +52,105 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
  * Send a flashh message showed on the top of the page.
  * Styled based on his status {error,info,success,warm}
  */
-function setFlash(msg, status) {
-	$('.flash').remove();
-	$('body').prepend('<div class="flash '+status+'"><span>' + msg + '</span></div>');
+function setFlash(msg, status,title) {
+	var flash = '<div class="'+status+'">';
+	if(title)
+		flash += '<h3 class="title">' + title +'</h3>';
+	flash += '<p class="content">'+msg+'</p></div>';
+	
+	$flashPanel.html(flash).show(1500).hide(12000);
+
 }
 
-function displayLoginSignup(url,_cbDone){
-	url = (!url) ? '/login' : url ; // Set a defaul value :: /login
-	$loginPanel.removeClass('hidden');
-	launchAjaxRequest(url,null,null,
-		function (html_data,status){ // If the AJAX Request is okay ( Status : 200)
-			$loginPanel.html(html_data);
-			if(_cbDone) _cbDone();
-		}
-		,function (data){
-			if(data.responseText === 'TokenExpiredError'){
-				setFlash('Your session has expires. Please login again to continue', 'error');
-			}
+/**
+ * Put in the adress bar the displyead part 
+ * /#{login, list, logout,add,...}
+ */
+function setAnchor(currentAnchor,descr){
+	window.location.hash = currentAnchor;
+	if(descr)
+		window.location.hash += '-'+descr;
+	//window.history.pushState({},null, currentAnchor);
+	//document.title = anchor;
+	anchor = currentAnchor;
+
+	if('login' === anchor)
+		$('#area').attr('href','/signup').attr('act','signup').text(' Signup');
+	else
+		$('#area').attr('href','/logout').attr('act','logout').text(' Logout');
+
+}
+
+
+
+/**
+ * What to display on the homepagee link
+ */
+function displayHome(){
+	setAnchor('home');
+	listing('/ziks/by/title',function (){	// GET All ziks for the homepage
+		$listingPanel.prepend('<h2>All ziks added</h2>');
 	});
 }
 
 
 
-function logMeOut(){
+function displayLoginSignup(url,_cbDone){
+	url = url || '/login'  ; // Set a defaul value :: /login
+	$loginPanel.show();
+	launchAjaxRequest(url,null,null,
+		function (html_data,status){ // If the AJAX Request is okay ( Status : 200)
+			$loginPanel.html(html_data); // Fill the login div with the html
+			setAnchor('login'); // Put in the adress bar the displyead part
+			if(_cbDone) _cbDone();
+		}
+		,function(errJSON) {
+		 	if(errJSON && errJSON.name === 'TokenExpiredError'){
+				logUserOut();
+				setFlash('Your session has expired. Please login again to continue', 'error','Session Expired');
+			}
+		}
+	);
+}
+
+function formHandler(e,cb){
+	e.preventDefault();
+	var formData = {'url':  this.action};
+	formData['method'] = this.method;
+	// Get the val of the input
+	$("input").each(function (index,input) {
+		if(input.name){
+			if(input.type === 'text' || input.type === 'password' || input.type === 'checkbox' && input.checked)
+				formData[input.name] = input.value;
+		}
+	});
+
+	launchAjaxRequest(formData.url,formData.method,formData,
+		function (token,status){ // If the AJAX Request is okay ( Status : 200)
+			console.log("Token de %s  ==> %s",formData.pseudo);
+			$loginPanel.hide(); // Hide the login div
+			if(token){
+				sessionStorage.setItem('token',token); // SAve the token in the sessionStorage
+				displayHome()
+			}
+		}
+	);
+}
+
+
+
+function logUserOut(){
 	sessionStorage.removeItem('token');
 	window.location.href = '/'; // Redirect to the homePage
 };
 
 
 function listing(_url,_cbDone,_cbFail){
-	// GET All ziks for the homepage
+	// GET a listing on the left panel
 	launchAjaxRequest(_url, null,null
 		,function (html_data) {
-			$listingPanel.removeClass('hidden'); // Diplay the listing content
+			$actionPanel.hide(); // Hidden on the action panel
+			$listingPanel.show(); // Diplay the listing content
 			$listingPanel.html(html_data); // Fill the listing div with the page required
 			if(_cbDone) _cbDone();
 		}
@@ -84,86 +162,105 @@ function listing(_url,_cbDone,_cbFail){
 }
 
 
-function acting (_url,_datas){
+function acting (_act,_url,_datas){
+	console.log('Acting on : ',_act);
 	
+	var _fnDone = null, _fnFail = null;
+	
+	switch (_act) {
+		case 'add':
+			
+			break;
+		
+		case 'delete' :
+			
+			break;
+			
+		case 'update' :
+			
+			break;
+		
+		default:
+			// code
+	}
+	
+	
+	launchAjaxRequest(_url, null,null
+		,function (html_data) {
+			$actionPanel.show(); // Diplay the action content on the right
+			$actionPanel.html(html_data); // Fill the action div with the page required
+			if(_fnDone) _fnDone();
+		}
+		, function(err) {
+			console.log('Error Index : '+ err);	
+			if(_fnFail) _fnFail(err);
+		}
+	);
 	
 };
 
 
-$(function() {
+
+
+function bindClickOnLinks(e){
+	e.preventDefault();
+	
+	var url = e.target.getAttribute("href"),
+		act  = e.target.getAttribute('act'),
+		descr = e.target.getAttribute('descr');
+		
+	// Check first if the user can make this action
+	if(act && act != 'signup' && !checkIfAuthUser())
+		return displayLoginSignup(); 
+
+	switch (act) {
+		case 'home':
+			displayHome();
+			break;
+		case 'login' :
+			displayLoginSignup();
+			break;
+		case 'logout' :
+			logUserOut();
+			break; 
+		case 'signup' :
+			displayLoginSignup('/signup')
+			break;
+		case 'list' :
+			listing(url);
+			break;
+		default: // For the rerst, (add,update,delete)
+			acting(act,url);
+			
+	}
+
+	setAnchor(act);
+}
 
 	// No token --> no visit
-	if(!sessionStorage.getItem('token')){
-	 	displayLoginSignup(null,function (){
-	 		// if click on the submit btn, call this fct
-			$('#send').click(function (e){
-				e.preventDefault();
-				if(sessionStorage){ // If the sessionStore exists
-					var pseudo =  $('#pseudo').val() ,passwd = $('#passwd').val();
-					launchAjaxRequest('/login','POST',{'pseudo' :pseudo ,'passwd' : passwd},
-						function (data,status){ // If the AJAX Request is okay ( Status : 200)
-							console.log("Token de %s  ==> %s",pseudo,data);
-							if(data){
-								sessionStorage.setItem('token',data); // SAve the token in the sessionStorage
-								$loginPanel.addClass('hidden'); // Hide the login div
-								listing('/ziks/by/title',function (){	// GET All ziks for the homepage
-									$listingPanel.prepend('<h2>All ziks added</h2>');
-								});
-							}
-						}
-						,function (data){
-							if(data.responseText === 'TokenExpiredError'){
-								setFlash('Your session has expires. Please login again to continue', 'error');
-							}
-					});
-				}else{
-					console.log("The session Storage is not supported ! Please active JavaScript to use it");
-				}
-			});
-	 	});
-	}else{
-		$('#area').attr('href','/logout').text(' Logout');
-	}
+function checkIfAuthUser(){
+	return (sessionStorage && sessionStorage.getItem('token'));
+}
+
+
+$(function() {
+	
+	$("a").on("click", bindClickOnLinks);
+	
+	// All click on an link is handled by this fct
+	$container.delegate("a", "click", bindClickOnLinks);
+
+	// All form submitted is handled by this fct
+	$container.delegate("form", "submit", formHandler);
 	
 	
-	$('form').submit(function (e){
-		e.preventDefault();
-		console.log(" Hey form submiting ... ")	;
-	});
+	// No token --> no visit
+	if(!checkIfAuthUser())
+		return displayLoginSignup();
+
+	displayHome();
+
 	
 
-	// Click on the nav link on top
-	$('a').click(function(e) {
-		e.preventDefault();
-		var url = e.target.getAttribute("href");
-		if('/' === url){
-			window.location.replace('/');
-			return;
-		}
-		if(url === '/logout')
-			return logMeOut();
-
-		console.log('Click on some link : %s',url);
-		launchAjaxRequest(url,null,null
-			,function(datas,status) {
-				if(url === '/signup'){
-					displayLoginSignup('/signup',function() {
-					    // Exec this cb if the signup is diplayed
-					    console.log("Sign me Up NOW !!");
-	
-					});
-				}else{
-					listing(url);
-				}
-			},function(err) {
-				if(err.responseText === 'TokenExpiredError'){
-					setFlash('Your session has expires. Please login again to continue', 'error');
-					//window.location.href = '/login';
-				}
-			}
-		);
-	});
-	
-	
 
 });

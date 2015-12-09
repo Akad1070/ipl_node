@@ -48,8 +48,7 @@ var signup = function (user,cb) {
 	userDAO.exist(user.pseudo, function (err, alreadyExists){
 		if(err) if(cb) return cb(err);
 
-		if(alreadyExists)
-			if(cb) return cb(null,user.pseudo +' has been already token. Choose another');
+		if(alreadyExists && cb) return cb(null,user.pseudo +' has been already token. Choose another');
 
 		// Generate a salt
 	    bcrypt.genSalt(8, function(err, salt) {
@@ -82,12 +81,10 @@ var signup = function (user,cb) {
  */
 var login = function (pseudo,pass,cb){
 	userDAO.get(pseudo, function (err,dbUser) {
-		if(err)	if(cb) return cb(err);
-	
-		console.log('[User] Pseudo : %s',pseudo);
+		if(err && cb) return cb(err);
 
 		if(!dbUser || pseudo !== dbUser.pseudo)
-			if(cb) return cb(new Error("[User] This user "+ pseudo +" doesn't exists in our system.<br>"));
+			if(cb) return cb(new Error("[User] This user '"+ pseudo +"' doesn't exists in our system"));
 
 		// If the 2 password !=
 		bcrypt.compare(pass, dbUser.passwd, function(err, isMatch) {
@@ -97,15 +94,7 @@ var login = function (pseudo,pass,cb){
 			if(!isMatch)
 				if(cb) return cb(new Error("[User] The password for "+ pseudo +" is incorrect"));
 
-			
-			// Get the user in REDiS
-			userDAO.getVal('token+'+dbUser.pseudo,function (err, token) {
-			    if(err || !token)
-			    	token = genToken(dbUser);
-
-		    	dbUser['token'] = token;
-   				if(cb) return cb(null,dbUser,('[User] Auth User('+ pseudo +') :=: Okay'));
-			});
+   			if(cb) return cb(null,genToken(dbUser),('[User] Auth User('+ pseudo +') :=: Okay'));
 		});
 	});
 };
@@ -118,16 +107,7 @@ var genToken = function (dbUser) {
 	var cryptKey = new Buffer(config.secretkey, 'base64').toString('ascii');
 
 	// Generate the token with the user pseudo & passwd
-	var token = jwt.sign(dbUser,cryptKey,{
-		expiresIn : config.expiration
-	});
-
-	userDAO.insertVal('token+'+dbUser.pseudo,token,function (err,msg){
-		if(err)
-			return err.message;
-		//userDAO.expiresIn('token+'+dbUser.pseudo,config.expiration);
-		return token;
-	});
+	return jwt.sign(dbUser,cryptKey,{expiresIn : config.expiration});
 
 };
 

@@ -1,17 +1,24 @@
 
 
-nav
-	a(href='/', title='HomePage') Home |
-
-	a(href='/ziks/add', title='All zik by Author')  New zik |
-
-	a(href='/ziks/by/author', title='All zik by Author')  Zik by Authors |
-
-	a(href='/ziks/by/genre', title='All zik by Genre')  Zik by Genre |
-
-	a(href='/ziks/by/title', title='All zik by Title')  Zik by Title |
-
-	a#area(href='/login', title='All zik by Title')  User Area
+nav#menu.clearfix
+	ul.clearfix
+		li.item
+			a(href='/', title='HomePage',act='home') Home 
+	
+		li.item
+			a(href='/ziks/add', title='All zik by Author',act='add')  New zik 
+	
+		li.item
+			a(href='/ziks/by/author', title='All zik by Author',act='list',descr='author')  Zik by Authors 
+	
+		li.item
+			a(href='/ziks/by/genre', title='All zik by Genre',act='list',descr='genre')  Zik by Genre 
+	
+		li.item
+			a(href='/ziks/by/title', title='All zik by Title',act='list',descr='title')  Zik by Title 
+	
+		li.item
+			a#area(href='/login', title='All zik by Title',act='login')  User Area
 
 header
 	h1 #{header}
