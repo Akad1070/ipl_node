@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Global var 
+ * Global vars
  */
 var $container = $('.container'),
 	$flashPanel = $('#flashMsg'),
@@ -20,11 +20,11 @@ var $container = $('.container'),
 
 
 /**
- * Launch an AJAX Request with the def settings
+ * Launch an AJAX Request with the default settings
  */
-function launchAjaxRequest(url,_method, _data,cbDone,cbFail){
-	// To notify the use that requeest in executing
-	$flashPanel.html('<div class="flash info"><span>Workin..</span></div>');
+function launchAjaxRequest(url,type, datas,cbDone,cbFail){
+	// To notify the use that request in executing
+	//	$flashPanel.html('<div class="flash info"><span>Workin..</span></div>');
 	//setFlash('Test Notif Message','info','Notif title');
 	
 	var reqAjax =  $.ajax({
@@ -32,8 +32,8 @@ function launchAjaxRequest(url,_method, _data,cbDone,cbFail){
 				'api-token' : sessionStorage.getItem('token')
 			}
 			,url  : url
-			,method : _method || 'GET'
-			,data : _data
+			,method : type || 'GET'
+			,data : datas
 	});
 
 	reqAjax.done(function (data,status) {
@@ -97,6 +97,7 @@ function displayActing(url,datas){
 	console.log('Acting on : ',anchor);
 	launchAjaxRequest(url, null,null
 		,function (html_data) {
+			if(anchor === 'add') $listingPanel.hide();
 			$actionPanel.show(); // Diplay the action content on the right
 			$actionPanel.html(html_data); // Fill the action div with the page required
 		}
@@ -122,7 +123,7 @@ function displayHome(){
  * What to display to list something.
  */ 
 function displayListing(url,cbDone,cbFail){
-	// GET a listing on the left panel
+	// GET a listing on the left pane
 	launchAjaxRequest(url, null,null
 		,function (html_data) {
 			$actionPanel.hide(); // Hidden on the action panel
@@ -190,7 +191,7 @@ function formHandler(e){
 			
 			break;
 		case 'update' :
-			_fnDone = function (msg){	setFlash(msg,'success','Updating Zik');	};
+			_fnDone = function (msg){	setFlash(msg,'success','Updating Zik');	;}
 			break;
 		case 'login' :
 			_fnDone = function (token){
@@ -221,7 +222,9 @@ function formHandler(e){
 
 
 
-
+/**
+ * What to do for all links.
+ */
 function bindClickOnLinks(e){
 	e.preventDefault();
 
@@ -231,7 +234,7 @@ function bindClickOnLinks(e){
 
 	// Check first if the user can make this action
 	if(act && act != 'signup' && !checkIfAuthUser())
-		return displayLoginSignup(); 
+		return ;// displayLoginSignup(); 
 
 	switch (act) {
 		case 'home':
@@ -249,12 +252,12 @@ function bindClickOnLinks(e){
 		case 'list' :
 			displayListing(url);
 			break;
-		default: // For the rerst, (add,update,delete)
+		default: // For the rest, (add,update,delete)
 			displayActing(url);
 			
 	}
 
-	setAnchor(act);
+	setAnchor(act,descr);
 }
 
 
@@ -284,8 +287,7 @@ $(function() {
 
 	// All form submitted is handled by this fct
 	$container.delegate("form", "submit", formHandler);
-	
-	
+
 	// No token --> no visit
 	if(!checkIfAuthUser())
 		return displayLoginSignup();
