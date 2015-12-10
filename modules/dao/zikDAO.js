@@ -134,12 +134,11 @@ var getZikBy = function (obj,cb) {
 var maj = function  (oldTitle,obj,cb) {
 	mongo.getCollection(config.db.mongo.collections.musics, function (err,docZiks,msg) {
 		if(err) return ( (cb) ? cb(err) : null);
-
 		mongo.update(docZiks,oldTitle,obj,function (err, doc) {
 			var val = '\''+oldTitle +'\'';
 			if(err)
 				if(cb) return cb(' '+err.message+val);
-			if(cb) return cb(null,doc.value,msg+val);
+			if(cb) return cb(null,msg+val);
 		});
 
 	});

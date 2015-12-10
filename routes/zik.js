@@ -221,15 +221,14 @@ var majZikPosted = function (req,res,next) {
 		});
 	}
 
-	User.updateZik(req.params.title
-		,req.body.title,req.body.author,req.body.genre
-		, function (err,data,msg){
+	User.updateZik(req.params.title,req.body.title,req.body.author,req.body.genre
+		, function (err,msg){
 			if(err){
 				logger.warn(err.message);
 				return res.status(404).send(err);
 			}else{
 				logger.info('[ZikDao] '+msg);
-				return res.status(200).send(data);
+				return res.status(200).send(msg);
 			}
 			//req.params['field'] = 'title'; req.params['val'] = data.title;
 			//return res.render('update',{header : 'Updating \''+req.params.title+'\'',zik : data});

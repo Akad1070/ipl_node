@@ -243,7 +243,11 @@ form textarea {
 
 #actions{
 	
-	border : 1px solid black;
+	padding:30px;
+    background:rgba(0, 0, 0, 0.1);
+    border:rgba(0, 0, 0, 0.2);
+    font-size:17px;
+    border-radius:15px;
 	/*width: 60%;*/
 	padding : 17px;
 	
