@@ -98,6 +98,7 @@ function displayActing(url,datas){
 	launchAjaxRequest(url, null,null
 		,function (html_data) {
 			if(anchor === 'add') $listingPanel.hide();
+			if(anchor === 'delete') $actionPanel.addClass('warn');
 			$actionPanel.show(); // Diplay the action content on the right
 			$actionPanel.html(html_data); // Fill the action div with the page required
 		}
@@ -187,7 +188,10 @@ function formHandler(e){
 			
 			break;
 		case 'delete' :
-			_fnDone = function (msg){	setFlash(msg,'warn','Deleting Zik');};
+			_fnDone = function (msg){
+				 $actionPanel.removeClass('warn');
+				setFlash('success','Deleting Zik');
+			};
 			
 			break;
 		case 'update' :

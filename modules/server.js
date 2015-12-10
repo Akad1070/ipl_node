@@ -114,67 +114,15 @@ var _configureRoutes = function () {
 	app.route('/signup')
 			.get(defRoute.signup)
 			.post(defRoute.signupPosted);
-
 	app.get('/stop',stop);
 
 
-
-	/**
-	 *  Sub-Router handler for /ziks
-	 */
-	var appZiks = express.Router();
-
-	// Auth for all /zik/*
-	appZiks.all('/*', defRoute.isAuth);
-	
-	appZiks.param('field',zikRoute.checkParamField);
-	appZiks.param('title',zikRoute.checkParamTitle);
-
-	appZiks.route('/add')
-			.get(zikRoute.add)
-			.post(zikRoute.addPosted);
-
-	//		/ziks/by/author/desc
-	appZiks.get('/by/:field/:sort?', zikRoute.listBy);
-
-	appZiks.route('/delete/:title')
-			.get(zikRoute.del)
-			.post(zikRoute.delPosted, zikRoute.list);
-
-	//		/ziks/list/title/Echo
-	appZiks.get('/list/:field?/:val?',zikRoute.list);
-
-	appZiks.route('/update/:title')
-			.get(zikRoute.update)
-			.post(zikRoute.updatePosted);
-
-	appZiks.get("/:field/:val",zikRoute.get);
-
-	app.use('/ziks', appZiks);
+	 // Sub-Router handler for /ziks
+	app.use('/ziks', zikRoute);
 
 
-	/**
-	 *  Sub-Router handler for /api
-	 */
-
-	var appApi = express.Router();
-
-	// Check for the api if token
-	appApi.all('/*', apiRoute.isAuth);
-
-	appApi.route('/ziks')
-			.get(apiRoute.getAllZiks) // Get All ziks
-			.post( apiRoute.postZiks); // Create a new Zik
-
-	appApi.route('/ziks/:title')
-			.get(apiRoute.getZik)
-			.post(apiRoute.postZiks)
-			.put(apiRoute.updateZik)
-			.delete(apiRoute.delZik);
-
-	appApi.get('/ziks/:field/:val', apiRoute.getZikBy);
-
-	app.use('/api', appApi);
+	//  Sub-Router handler for /api
+	app.use('/api', apiRoute);
 
 
 

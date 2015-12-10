@@ -15,6 +15,12 @@ var jwt    = require('jsonwebtoken');
 var logger = require('../modules/logger');
 var config = require('../modules/config');
 var User   = require('../modules/user');
+var express = require('express');
+var appApi = express.Router();
+
+
+
+
 
 
 
@@ -78,18 +84,6 @@ var _checkParamFieldForList = function (field,res,cb) {
  * Get all Ziks for the requested title,  author ou genre.
  */
 var getAllZiks = function (req,res) {
-/*
-	_checkParamFieldForList(req.params.field, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : err.message});
-	});
-
-	_checkParamFieldForList(req.params.val, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : "Missing the value of the field to execute the command"});
-	});
-*/
-
 	User.listerZik('title', null , function (err,datas,msg) {
 		if(err){
 			logger.warn(err.message);
@@ -109,15 +103,6 @@ var getAllZiks = function (req,res) {
  * Can also have be sorted by {asc , desc} || ASC by default
  */
 var listerSortedBy = function (req,res) {
-	_checkParamFieldForList(req.params.field, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : err.message});
-	});
-
-	_checkParamFieldForList(req.params.sort, res,function (err) {
-		if(err)
-			req.params.sort = 'desc';
-	});
 	User.listerZikByField(req.params.field, req.params.sort, function (err,datas,msg) {
 		if(err){
 			logger.warn(err.message);
@@ -134,15 +119,6 @@ var listerSortedBy = function (req,res) {
  *
  */
 var getZikBy = function (req,res) {
-	_checkParamFieldForList(req.params.field, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : err.message});
-	});
-	_checkParamFieldForList(req.params.val, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : "Missing the value of the field to execute the command"});
-	});
-
 	User.getZik(req.params.field,req.params.val, function (err,data,msg) {
 		if(err){
 			logger.warn(err.message);
@@ -175,11 +151,6 @@ var getZik = function (req,res) {
  * Redirect to page Zik with the updated Zik.
  */
 var majZik = function (req,res) {
-	_checkParamFieldForList(!req.params.title, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : err.message});
-	});
-
 	User.updateZik(req.params.title,req.body.title,req.body.author,req.body.genre, function (err,data,msg){
 		if(err){
 			logger.warn(err.message);
@@ -197,10 +168,6 @@ var majZik = function (req,res) {
  * Delete the specified zik by his title.
  */
 var delZik = function (req,res) {
-	_checkParamFieldForList(!req.params.title, res,function (err) {
-		if(err)
-			return res.status(404).json({'err' : "Missing the title to execute the command"});
-	});
 	User.deleteZik(req.params.title, function (err,msg) {
 		if(err){
 			logger.warn(err.message);
@@ -215,17 +182,35 @@ var delZik = function (req,res) {
 
 
 
+
+
+
+
+
+
+/***
+ * Routes for /api 
+ */
+
+	// Check for the api if token
+	appApi.all('/*', isAuth);
+
+	appApi.route('/ziks')
+			.get(getAllZiks) // Get All ziks
+			.post( addZik); // Create a new Zik
+
+	appApi.route('/ziks/:title')
+			.get(getZik)
+			.post(addZik)
+			.put(majZik)
+			.delete(delZik);
+
+	appApi.get('/ziks/:field/:val', getZikBy);
+
+
+
 /**
  * Exports
  */
-
-// Methods
-exports.isAuth		= isAuth;
-exports.delZik      = delZik;
-exports.getZik      = getZik;
-exports.getZikBy    = getZikBy;
-exports.sortedBy    = listerSortedBy;
-exports.getAllZiks  = getAllZiks;
-exports.postZiks    = addZik;
-exports.updateZik   = majZik;
+exports		= appApi;
 
