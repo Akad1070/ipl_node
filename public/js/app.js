@@ -1,3 +1,5 @@
+"use strict";
+
 var $container = $('.container'),
 	$flashPanel = $('#flashMsg'),
 	$listingPanel = $('#listing'),
@@ -10,7 +12,7 @@ var $container = $('.container'),
 	    '403' : "Forbidden resource not accessible.",
 	    '500' : "Internal Server Error.",
 	    '503' : "Service Unavailable."
-	};
+	}
 
 ;
 
@@ -22,7 +24,6 @@ function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
 	// To notify the use that requeest in executing
 	
 	$flashPanel.html('<div class="flash info"><span>Workin..</span></div>');
-
 
 	//setFlash('Test Notif Message','info','Notif title');
 	var reqAjax =  $.ajax({
@@ -63,8 +64,7 @@ function setFlash(msg, status,title) {
 }
 
 /**
- * Put in the adress bar the displyead part 
- * /#{login, list, logout,add,...}
+ * Put in the adress bar the displayed part /#{login, list, logout,add,...}
  */
 function setAnchor(currentAnchor,descr){
 	window.location.hash = currentAnchor;
@@ -125,14 +125,50 @@ function formHandler(e,cb){
 		}
 	});
 
-	launchAjaxRequest(formData.url,formData.method,formData,
-		function (token,status){ // If the AJAX Request is okay ( Status : 200)
-			console.log("Token de %s  ==> %s",formData.pseudo);
-			$loginPanel.hide(); // Hide the login div
-			if(token){
-				sessionStorage.setItem('token',token); // SAve the token in the sessionStorage
-				displayHome()
+	
+	var _fnDone = null, _fnFail = null;
+	
+	switch (anchor) {
+		case 'add':
+			_fnDone = function (msg){
+				setFlash(msg,'success','New Zik');
 			}
+			break;
+		
+		case 'delete' :
+			_fnDone = function (msg){
+				setFlash(msg,'warn','Deleting Zik');
+			}
+			break;
+			
+		case 'update' :
+			_fnDone = function (msg){
+				setFlash(msg,'success','Updating Zik');
+			}
+			break;
+		case 'login' :
+			_fnDone = function (token){
+				console.log("Token de %s  ==> %s",formData.pseudo);
+				$loginPanel.hide(); // Hide the login div
+				if(token){
+					sessionStorage.setItem('token',token); // SAve the token in the sessionStorage
+					return displayHome();
+				}
+			}
+		default:
+			console.log("Acting : Did something :-)");
+	}
+	
+
+
+
+	launchAjaxRequest(formData.url,formData.method,formData,
+		function (data,status){ // If the AJAX Request is okay ( Status : 200)
+			if(_fnDone) _fnDone();
+			listing("/ziks/by/title");	
+		}, function(errJSON) {
+			console.log('Error Index : '+ errJSON);	
+			if(_fnFail) _fnFail(errJSON);
 		}
 	);
 }
@@ -162,39 +198,15 @@ function listing(_url,_cbDone,_cbFail){
 }
 
 
-function acting (_act,_url,_datas){
-	console.log('Acting on : ',_act);
-	
-	var _fnDone = null, _fnFail = null;
-	
-	switch (_act) {
-		case 'add':
-			
-			break;
-		
-		case 'delete' :
-			
-			break;
-			
-		case 'update' :
-			
-			break;
-		
-		default:
-			// code
-	}
-	
-	
+function acting (_url,_datas){
+	console.log('Acting on : ',);
+
 	launchAjaxRequest(_url, null,null
 		,function (html_data) {
 			$actionPanel.show(); // Diplay the action content on the right
 			$actionPanel.html(html_data); // Fill the action div with the page required
-			if(_fnDone) _fnDone();
 		}
-		, function(err) {
-			console.log('Error Index : '+ err);	
-			if(_fnFail) _fnFail(err);
-		}
+		, function(err) {}
 	);
 	
 };
