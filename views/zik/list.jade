@@ -15,4 +15,4 @@ block content
 			each item in list
 				- var txt = item[type]
 				li
-					a.list(href='/ziks/list/'+type+'/'+item[type], title='List all zik of '+txt,act='list')= item[type]
+					a.list(href='/ziks/list/'+type+'/'+item[type], title='List all zik of '+txt,act='list',desc=txt)= item[type]

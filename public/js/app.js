@@ -1,5 +1,7 @@
 "use strict";
-
+/**
+ * Global var 
+ */
 var $container = $('.container'),
 	$flashPanel = $('#flashMsg'),
 	$listingPanel = $('#listing'),
@@ -20,17 +22,16 @@ var $container = $('.container'),
 /**
  * Launch an AJAX Request with the def settings
  */
-function launchAjaxRequest(_url,_method, _data,cbDone,cbFail){
+function launchAjaxRequest(url,_method, _data,cbDone,cbFail){
 	// To notify the use that requeest in executing
-	
 	$flashPanel.html('<div class="flash info"><span>Workin..</span></div>');
-
 	//setFlash('Test Notif Message','info','Notif title');
+	
 	var reqAjax =  $.ajax({
 			headers: {
 				'api-token' : sessionStorage.getItem('token')
 			}
-			,url  : _url
+			,url  : url
 			,method : _method || 'GET'
 			,data : _data
 	});
@@ -83,26 +84,71 @@ function setAnchor(currentAnchor,descr){
 
 
 
+
+//////////////////////////////////////////////////////////
+//////////FUNCTIONS to DISPLAY the CONTENT requested./////
+//////////////////////////////////////////////////////////
+
+
 /**
- * What to display on the homepagee link
+ * What to display on acting link (add,update,delete)
+ */
+function displayActing(url,datas){
+	console.log('Acting on : ',anchor);
+	launchAjaxRequest(url, null,null
+		,function (html_data) {
+			$actionPanel.show(); // Diplay the action content on the right
+			$actionPanel.html(html_data); // Fill the action div with the page required
+		}
+		, function(errJSON) {
+			
+		}
+	);
+};
+
+
+/**
+ * What to display on the homepage link.
  */
 function displayHome(){
 	setAnchor('home');
-	listing('/ziks/by/title',function (){	// GET All ziks for the homepage
+	displayListing('/ziks/by/title',function (){	// GET All ziks for the homepage
 		$listingPanel.prepend('<h2>All ziks added</h2>');
 	});
 }
 
 
+/**
+ * What to display to list something.
+ */ 
+function displayListing(url,cbDone,cbFail){
+	// GET a listing on the left panel
+	launchAjaxRequest(url, null,null
+		,function (html_data) {
+			$actionPanel.hide(); // Hidden on the action panel
+			$listingPanel.show(); // Diplay the listing content
+			$listingPanel.html(html_data); // Fill the listing div with the page required
+			if(cbDone) cbDone();
+		}
+		, function(data) {
+			console.log('Error Index : '+ data);	
+			if(cbFail) cbFail(data);
+		}
+	);
+}
 
-function displayLoginSignup(url,_cbDone){
+
+/**
+ * Display the login part. 
+ */
+function displayLoginSignup(url,cbDone){
 	url = url || '/login'  ; // Set a defaul value :: /login
 	$loginPanel.show();
 	launchAjaxRequest(url,null,null,
 		function (html_data,status){ // If the AJAX Request is okay ( Status : 200)
 			$loginPanel.html(html_data); // Fill the login div with the html
-			setAnchor('login'); // Put in the adress bar the displyead part
-			if(_cbDone) _cbDone();
+			setAnchor('login'); // Put in the adress bar the displayed part
+			if(cbDone) cbDone();
 		}
 		,function(errJSON) {
 		 	if(errJSON && errJSON.name === 'TokenExpiredError'){
@@ -113,11 +159,18 @@ function displayLoginSignup(url,_cbDone){
 	);
 }
 
-function formHandler(e,cb){
+/////////////////////////////////////////////////
+///// FUNCTIONS to HANDLE certains EVENTS////////
+/////////////////////////////////////////////////
+ 
+
+/**
+ * Handle the submit of any form.
+ */
+function formHandler(e){
 	e.preventDefault();
 	var formData = {'url':  this.action};
-	formData['method'] = this.method;
-	// Get the val of the input
+	formData['method'] = this.method;	// Get the val of the input
 	$("input").each(function (index,input) {
 		if(input.name){
 			if(input.type === 'text' || input.type === 'password' || input.type === 'checkbox' && input.checked)
@@ -125,26 +178,19 @@ function formHandler(e,cb){
 		}
 	});
 
-	
 	var _fnDone = null, _fnFail = null;
 	
 	switch (anchor) {
 		case 'add':
-			_fnDone = function (msg){
-				setFlash(msg,'success','New Zik');
-			}
-			break;
-		
-		case 'delete' :
-			_fnDone = function (msg){
-				setFlash(msg,'warn','Deleting Zik');
-			}
-			break;
+			_fnDone = function (msg){	setFlash(msg,'success','New Zik');	};
 			
+			break;
+		case 'delete' :
+			_fnDone = function (msg){	setFlash(msg,'warn','Deleting Zik');};
+			
+			break;
 		case 'update' :
-			_fnDone = function (msg){
-				setFlash(msg,'success','Updating Zik');
-			}
+			_fnDone = function (msg){	setFlash(msg,'success','Updating Zik');	};
 			break;
 		case 'login' :
 			_fnDone = function (token){
@@ -155,17 +201,17 @@ function formHandler(e,cb){
 					return displayHome();
 				}
 			}
+			
+			break
 		default:
 			console.log("Acting : Did something :-)");
 	}
 	
-
-
-
+	// Launch a request to submit the form.
 	launchAjaxRequest(formData.url,formData.method,formData,
 		function (data,status){ // If the AJAX Request is okay ( Status : 200)
-			if(_fnDone) _fnDone();
-			listing("/ziks/by/title");	
+			if(_fnDone) _fnDone(data);
+			displayListing("/ziks/by/title");	
 		}, function(errJSON) {
 			console.log('Error Index : '+ errJSON);	
 			if(_fnFail) _fnFail(errJSON);
@@ -175,52 +221,14 @@ function formHandler(e,cb){
 
 
 
-function logUserOut(){
-	sessionStorage.removeItem('token');
-	window.location.href = '/'; // Redirect to the homePage
-};
-
-
-function listing(_url,_cbDone,_cbFail){
-	// GET a listing on the left panel
-	launchAjaxRequest(_url, null,null
-		,function (html_data) {
-			$actionPanel.hide(); // Hidden on the action panel
-			$listingPanel.show(); // Diplay the listing content
-			$listingPanel.html(html_data); // Fill the listing div with the page required
-			if(_cbDone) _cbDone();
-		}
-		, function(data) {
-			console.log('Error Index : '+ data);	
-			if(_cbFail) _cbFail(data);
-		}
-	);
-}
-
-
-function acting (_url,_datas){
-	console.log('Acting on : ',);
-
-	launchAjaxRequest(_url, null,null
-		,function (html_data) {
-			$actionPanel.show(); // Diplay the action content on the right
-			$actionPanel.html(html_data); // Fill the action div with the page required
-		}
-		, function(err) {}
-	);
-	
-};
-
-
-
 
 function bindClickOnLinks(e){
 	e.preventDefault();
-	
+
 	var url = e.target.getAttribute("href"),
 		act  = e.target.getAttribute('act'),
 		descr = e.target.getAttribute('descr');
-		
+
 	// Check first if the user can make this action
 	if(act && act != 'signup' && !checkIfAuthUser())
 		return displayLoginSignup(); 
@@ -239,20 +247,32 @@ function bindClickOnLinks(e){
 			displayLoginSignup('/signup')
 			break;
 		case 'list' :
-			listing(url);
+			displayListing(url);
 			break;
 		default: // For the rerst, (add,update,delete)
-			acting(act,url);
+			displayActing(url);
 			
 	}
 
 	setAnchor(act);
 }
 
-	// No token --> no visit
+
+
+/**
+ * No token --> no visit
+ */
 function checkIfAuthUser(){
 	return (sessionStorage && sessionStorage.getItem('token'));
 }
+
+/**
+ * What to do on logout.
+ */
+function logUserOut(){
+	sessionStorage.removeItem('token');
+	window.location.href = '/'; // Redirect to the homePage
+};
 
 
 $(function() {
