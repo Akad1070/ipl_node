@@ -112,9 +112,6 @@ var genToken = function (dbUser) {
 };
 
 
-/**
- *
- */
 var checkUserToken = function (token,cb) {
 	if (token) {
 		// verifies secret and checks
@@ -141,17 +138,29 @@ var checkUserToken = function (token,cb) {
  * @return Wheter an Error or a specific msg via the callback.
  */
 var addZik = function (tit,aut,gen,cb) {
+	var nZik = {}, 
+		missing = null;
+		
+	// I'm gonna check if all field required for a zik is present
+	// Otherwise, I add in the var missing the field missing or incorrect.
 	if(tit && typeof tit == 'string'){
+		nZik['title'] = tit;
 		if(aut && typeof aut == 'string'){
+			nZik['author'] = aut;
 			if(gen && typeof gen == 'string'){
-				zikDAO.add({'title' : tit},{'title' : tit, 'author' : aut, 'genre' : gen}, function (err,data,msg){
-					if(err)	if(cb) return cb(err);
-					if(cb) return cb(null,data,'[ZikDAO] '+msg);
+				nZik['genre'] = gen;
+				zikDAO.add({'title' : tit},nZik, function (err,data,msg){
+					if(err && cb) return cb(err);
+					if(cb) return cb(null,data,msg);
 				});
-			}
-		}
-	}
-	//if(cb) return cb(new Error('[User] Some field from the zik are incorrect { title : '+tit+', author : '+ aut+', genre : '+gen+'}'));
+			}else{	missing += ', genre : '+gen+"\'";}
+		}else{	missing +=	', author : '+ aut+"\'";}
+	}else{	missing = '[User] Some field from the zik are incorrect' + '{ title : '+tit+"\'";}
+	
+	// If I got any missing error, send a Error(missing)
+	if(missing)
+		if(cb) return cb(new Error(missing += '}'));
+	
 };
 
 

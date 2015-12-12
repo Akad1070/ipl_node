@@ -113,8 +113,9 @@ var selectAll = function (collects,cond,options,callback){
 
     query.toArray(function (err, docs) {
     	if(err)
-    		if(callback) return callback(new Error(' Error on listing all ziks'));
+    		if(callback) return callback(new Error('Error on listing all'));
     	if(callback) return callback(null,docs);
+    	return docs;
     });
 
 };
@@ -122,13 +123,13 @@ var selectAll = function (collects,cond,options,callback){
 
 /**
  *  Get the specified collection
- *
  */
 var selectOne = function (collects,select,where,options,callback) {
     return selectAll(collects,select,options,function (err, docs) {
 		if(err)
-			if(callback) return callback(new Error(' Error on finding '));
-		if(callback) return callback(null,docs,' Found zik requested');
+			if(callback) return callback(new Error('Error on finding '));
+		if(callback) return callback(null,docs,'Found zik requested');
+		return docs;
 	});
 
 };
@@ -137,8 +138,9 @@ var selectOne = function (collects,select,where,options,callback) {
 var insert = function (collects,select,nObj,cond,options,cb) {
     collects.findOneAndReplace(select,nObj,cond, function (err, result) {
 		if(err)
-			if(cb) return cb(new Error(' Error on inserting '+nObj.titre));
+			if(cb) return cb(new Error('Error on inserting '));
 		if(cb) return cb(null,nObj);
+		return nObj;
 	});
 };
 
@@ -152,8 +154,9 @@ var update = function (collects,oObj,nObj,callback){
 		}
 		,function (err, doc) {
 			if(err)
-				if(callback) return callback(new Error(' Error on updating '));
-			if(callback) return callback(null,doc,' Updated ');
+				if(callback) return callback(new Error('Error on updating '));
+			if(callback) return callback(null,doc,'Updated ');
+		    return doc;
 	});
 
 
@@ -164,8 +167,9 @@ var update = function (collects,oObj,nObj,callback){
 var del = function (collects,select,cb){
 	collects.findOneAndDelete(select,function (err, doc) {
 		if(err)
-			if(cb) return cb(new Error(' Error on deleting '));
-		if(cb) return cb(null,' Deletd ');
+			if(cb) return cb(new Error('Error on deleting '));
+		if(cb) return cb(null,'Deleted ');
+		return 'Made it';
 	});
 };
 

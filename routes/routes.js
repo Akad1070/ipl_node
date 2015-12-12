@@ -1,6 +1,6 @@
 
 /**
- * This API allows to CRUD nothing.
+ * This Route allows to login and signup.
  */
 
 
@@ -67,8 +67,10 @@ var serverError = function (err, req, res, next){
 	// log error:
 	logger.warn('[Server] ' + (err.status != 500) ? err.message : err.stack);
 
-	// send output based on type of request json vs html
+	// Response depend on type of request JSON || HTML
 	var accept = req.headers.accept || '';
+	// The tilde ~ allows to make a true|| false operation
+	// Otherwise, indexof() return a int.
 	if (~accept.indexOf('json')) {
 		res.json({ error: "There was a server error :(" }, err.status || 500);
   	}else{
@@ -79,6 +81,33 @@ var serverError = function (err, req, res, next){
 	  });
 	}
 };
+
+
+/**
+ * Check the token in the header.
+ */
+var isAuth = function (req,res,next) {
+	// Check header or URL parameters or POST parameters for token
+	var token = req.headers['api-token'];
+
+	User.checkToken(token,function (err,decoded) {
+		if(err){
+			// Sending a 401 will require authentication,
+			logger.warn('[Server] Authentification Failed : '+err.message);
+			return res.status(401).send(err);
+		}
+		// Save some user info 
+		req.user = {
+			'pseudo' : decoded.pseudo,
+			'fullName' : decoded.fname +', '+decoded.lname
+		};
+		logger.info('[Server] Authorized for '+req.user.pseudo);
+		res.status(200);
+		return next();
+	});
+
+};
+
 
 
 
@@ -93,7 +122,6 @@ var serverError = function (err, req, res, next){
 var home = function (req,res,next) {
 	res.status(200);
 	res.render('home',{header : "Welcome to NodeZikApp"});
-	//return next();
  };
 
 
@@ -102,8 +130,6 @@ var home = function (req,res,next) {
 var signup = function (req,res,next) {
 	res.render('signup',{title: "SignUp",header : "Sign Up"});
 };
-
-
 
 var signupPosted = function (req,res,next) {
 	var msg = null;
@@ -155,26 +181,6 @@ var loginPosted = function (req,res,next) {
 
 
 
-var isAuth = function (req,res,next) {
-	// Check header or URL parameters or POST parameters for token
-	var token = req.headers['api-token'];
-
-	User.checkToken(token,function (err,decoded) {
-		if(err){
-			// Sending a 401 will require authentication,
-			logger.warn('[Server] Authentification Failed : '+err.message);
-			return res.status(401).send(err);
-		}
-		logger.info('[Server] Authorized');
-		//res.status(200).send('Hi '+"LePseudo"+', You look at my protected page :-) !');
-		return next();
-	});
-
-};
-
-
-
-
 
 
 
@@ -190,9 +196,7 @@ exports.checkErrorProd 	= checkErrorProd;
 exports.error404		= notFound;
 exports.error500		= serverError;
 
-
 exports.isAuth         	= isAuth;
-
 
 exports.home        	= home;
 

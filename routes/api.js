@@ -212,5 +212,5 @@ var delZik = function (req,res) {
 /**
  * Exports
  */
-exports		= appApi;
+module.exports		= appApi;
 

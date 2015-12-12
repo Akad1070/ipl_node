@@ -76,9 +76,9 @@ function setAnchor(currentAnchor,descr){
 	anchor = currentAnchor;
 
 	if('login' === anchor)
-		$('#area').attr('href','/signup').attr('act','signup').text(' Signup');
+		$('#area').attr('href','/signup').attr('act','signup').text(' Signup ');
 	else
-		$('#area').attr('href','/logout').attr('act','logout').text(' Logout');
+		$('#area').attr('href','/logout').attr('act','logout').text(' Logout ');
 
 }
 
@@ -185,17 +185,16 @@ function formHandler(e){
 	switch (anchor) {
 		case 'add':
 			_fnDone = function (msg){	setFlash(msg,'success','New Zik');	};
-			
 			break;
 		case 'delete' :
 			_fnDone = function (msg){
 				 $actionPanel.removeClass('warn');
-				setFlash('success','Deleting Zik');
+				setFlash(msg,'success','Deleting Zik');
 			};
 			
 			break;
 		case 'update' :
-			_fnDone = function (msg){	setFlash(msg,'success','Updating Zik');	;}
+			_fnDone = function (msg){	setFlash(msg,'success','Updating Zik');	}
 			break;
 		case 'login' :
 			_fnDone = function (token){
@@ -240,6 +239,8 @@ function bindClickOnLinks(e){
 	if(act && act != 'signup' && !checkIfAuthUser())
 		return ;// displayLoginSignup(); 
 
+	setAnchor(act,descr);
+	
 	switch (act) {
 		case 'home':
 			displayHome();
@@ -261,7 +262,6 @@ function bindClickOnLinks(e){
 			
 	}
 
-	setAnchor(act,descr);
 }
 
 

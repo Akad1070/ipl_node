@@ -118,17 +118,17 @@ var _configureRoutes = function () {
 
 
 	 // Sub-Router handler for /ziks
-	app.use('/ziks', zikRoute);
+	app.use('/ziks', defRoute.isAuth, zikRoute);
 
 
 	//  Sub-Router handler for /api
-	app.use('/api', apiRoute);
+	app.use('/api', defRoute.isAuth , apiRoute);
 
 
 
 	/* The 404 Route (ALWAYS Keep this as the last route) */
-	app.use(defRoute.error404); // 404 handler
-	app.use(defRoute.error500); // 500 handler
+	//app.use(defRoute.error404); // 404 handler
+	//app.use(defRoute.error500); // 500 handler
 };
 
 
@@ -172,14 +172,6 @@ var stop = function (callback) {
 		if (callback) callback();
 	}
 };
-
-
-
-
-/**
- * Events on the Server
- */
-
 
 
 

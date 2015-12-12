@@ -5,7 +5,7 @@
 block content
 	p
 		| * - I need at least a title for the zik.
-	form(action='api/ziks/', method='POST')
+	form(action='/ziks/add', method='POST')
 		.field
 			label.field-label(for='title') Title
 			input#title.field-input(type='text', name='title', required='', autofocus='')
