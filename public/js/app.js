@@ -2,18 +2,33 @@
 /**
  * Global vars
  */
-var $container = $('.container'),
-	$flashPanel = $('#flashMsg'),
-	$listingPanel = $('#listing'),
-	$loginPanel = $('#login'),
-	$actionPanel = $('#actions').hide(),
-	anchor = window.location.hash,
-	mapStatusError = {
-	    '400' : "Server understood the request, but request content was invalid.",
-	    '401' : "Unauthorized Access.",
-	    '403' : "Forbidden resource not accessible.",
-	    '500' : "Internal Server Error.",
-	    '503' : "Service Unavailable."
+var $flashPanel 	= $('#flashMsg'),
+	$container		= $('.container'),
+	$header			= $('header > h1'),
+	$listingPanel	= $('#listing'),
+	$loginPanel 	= $('#login'),
+	$actionPanel 	= $('#actions').hide()
+	
+;
+var	_anchor 		= window.location.hash,
+	_descr 			= null,
+	_mapMsgs 		= {
+		"errorByStatus"	:	{
+		    '400' 	: "Server understood the request, but request content was invalid",
+		    '401' 	: "Unauthorized Access",
+		    '403' 	: "Forbidden resource not accessible",
+		    '500' 	: "Internal Server Error",
+		    '503' 	: "Service Unavailable"
+		},
+	    'TokenExpiredError'		:	'Your session has expired. Please login again to continue.',
+	    'msgHeader' : {
+	    	'add'	:	'Adding a new Zik',
+	    	'del'	:	'Deleting a Zik',
+	    	'def'	:	'Acting : Doing something :-)',
+	    	'home'	: 	'Welcome on NodeZikApp',
+	    	'maj'	:	'Updating a Zik'
+	    	
+	    }
 	}
 
 ;
@@ -41,9 +56,15 @@ function launchAjaxRequest(url,type, datas,cbDone,cbFail){
 		if(cbDone)	cbDone(data);
 	});
 	reqAjax.fail(function (xhr, textStatus, err) {
-		var title = mapStatusError[xhr.status] || 'Unknown error';
-		setFlash(xhr.responseText, 'error',title);
-		if(cbFail)	cbFail(xhr.responseJSON);
+		var errJSON = xhr.responseJSON || {'message' : xhr.responseText };
+		var title 	= _mapMsgs.errorByStatus[xhr.status ] || 'Error',
+			msg		=_mapMsgs.errorByStatus[errJSON.name] || errJSON.message || 'Shit happens';
+		
+		setFlash(msg, 'error',title);
+		if(errJSON.name === 'TokenExpiredError')
+			return logUserOut() && displayLoginSignup();
+		if(cbFail)	cbFail(errJSON);
+		
 	});
 
 	return reqAjax;
@@ -67,15 +88,16 @@ function setFlash(msg, status,title) {
 /**
  * Put in the adress bar the displayed part /#{login, list, logout,add,...}
  */
-function setAnchor(currentAnchor,descr){
+function setAnchor(currentAnchor,currentDescrip){
 	window.location.hash = currentAnchor;
-	if(descr)
-		window.location.hash += '-'+descr;
+	if(currentDescrip)
+		window.location.hash += '-'+currentDescrip;
 	//window.history.pushState({},null, currentAnchor);
 	//document.title = anchor;
-	anchor = currentAnchor;
+	_anchor	= 	currentAnchor;
+	_descr	=	currentDescrip;
 
-	if('login' === anchor)
+	if('login' === _anchor)
 		$('#area').attr('href','/signup').attr('act','signup').text(' Signup ');
 	else
 		$('#area').attr('href','/logout').attr('act','logout').text(' Logout ');
@@ -94,16 +116,32 @@ function setAnchor(currentAnchor,descr){
  * What to display on acting link (add,update,delete)
  */
 function displayActing(url,datas){
-	console.log('Acting on : ',anchor);
+	console.log('Acting on : ',_anchor);
 	launchAjaxRequest(url, null,null
 		,function (html_data) {
-			if(anchor === 'add') $listingPanel.hide();
-			if(anchor === 'delete') $actionPanel.addClass('warn');
+			switch (_anchor) {
+				case 'add':
+					$listingPanel.hide();
+					$header.text(_mapMsgs.msgHeader.add);
+					break;
+				
+				case 'delete' : 
+					$actionPanel.addClass('warn');
+					$header.text(_mapMsgs.msgHeader.del);
+					break;
+				
+				case 'update' : 
+					$header.text(_mapMsgs.msgHeader.maj);
+				
+				default:
+					// code
+			}
+			
 			$actionPanel.show(); // Diplay the action content on the right
 			$actionPanel.html(html_data); // Fill the action div with the page required
 		}
 		, function(errJSON) {
-			
+		
 		}
 	);
 };
@@ -115,6 +153,7 @@ function displayActing(url,datas){
 function displayHome(){
 	setAnchor('home');
 	displayListing('/ziks/by/title',function (){	// GET All ziks for the homepage
+		$header.text(_mapMsgs.msgHeader.home);
 		$listingPanel.prepend('<h2>All ziks added</h2>');
 	});
 }
@@ -130,6 +169,7 @@ function displayListing(url,cbDone,cbFail){
 			$actionPanel.hide(); // Hidden on the action panel
 			$listingPanel.show(); // Diplay the listing content
 			$listingPanel.html(html_data); // Fill the listing div with the page required
+			if(_descr) $header.text('All ziks by '+_descr);
 			if(cbDone) cbDone();
 		}
 		, function(data) {
@@ -153,10 +193,7 @@ function displayLoginSignup(url,cbDone){
 			if(cbDone) cbDone();
 		}
 		,function(errJSON) {
-		 	if(errJSON && errJSON.name === 'TokenExpiredError'){
-				logUserOut();
-				setFlash('Your session has expired. Please login again to continue', 'error','Session Expired');
-			}
+
 		}
 	);
 }
@@ -182,19 +219,19 @@ function formHandler(e){
 
 	var _fnDone = null, _fnFail = null;
 	
-	switch (anchor) {
+	switch (_anchor) {
 		case 'add':
-			_fnDone = function (msg){	setFlash(msg,'success','New Zik');	};
+			_fnDone = function (msg){	setFlash(msg,'success',_mapMsgs.msgHeader.add);	};
 			break;
 		case 'delete' :
 			_fnDone = function (msg){
-				 $actionPanel.removeClass('warn');
-				setFlash(msg,'success','Deleting Zik');
+				$actionPanel.removeClass('warn');
+				setFlash(msg,'success',_mapMsgs.msgHeader.del);
 			};
 			
 			break;
 		case 'update' :
-			_fnDone = function (msg){	setFlash(msg,'success','Updating Zik');	}
+			_fnDone = function (msg){	setFlash(msg,'success',_mapMsgs.msgHeader.maj);	}
 			break;
 		case 'login' :
 			_fnDone = function (token){
@@ -208,7 +245,7 @@ function formHandler(e){
 			
 			break
 		default:
-			console.log("Acting : Did something :-)");
+			console.log(_mapMsgs.msgHeader.def);
 	}
 	
 	// Launch a request to submit the form.
@@ -233,13 +270,13 @@ function bindClickOnLinks(e){
 
 	var url = e.target.getAttribute("href"),
 		act  = e.target.getAttribute('act'),
-		descr = e.target.getAttribute('descr');
+		descrip = e.target.getAttribute('descr');
 
 	// Check first if the user can make this action
 	if(act && act != 'signup' && !checkIfAuthUser())
 		return ;// displayLoginSignup(); 
 
-	setAnchor(act,descr);
+	setAnchor(act,descrip);
 	
 	switch (act) {
 		case 'home':
@@ -283,6 +320,7 @@ function logUserOut(){
 
 
 $(function() {
+	
 	
 	$("a").on("click", bindClickOnLinks);
 	

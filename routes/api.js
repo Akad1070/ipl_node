@@ -1,6 +1,6 @@
 
 /**
- * This API allows to CRUD nothing.
+ * This API allows to CRUD zik.
  */
 
 
@@ -8,40 +8,17 @@
 /**
  * Load modules
  */
+var appApi = require('express').Router()
 
-var jwt    = require('jsonwebtoken');
 
 // Mine - Custom
 var logger = require('../modules/logger');
-var config = require('../modules/config');
 var User   = require('../modules/user');
-var express = require('express');
-var appApi = express.Router();
 
 
 
 
 
-
-
-/**
- * Authentifucation for the API
- */
-var isAuth = function (req,res,next) {
-	// Check header or URL parameters or POST parameters for token
-	var token = req.headers['api-token'];
-
-	User.checkToken(token,function (err,decoded) {
-	//console.log('Token for isAuth %s',token);
-		if(err){
-			// Sending a 401 will require authentication,
-			return res.status(401);
-  		}
-		//res.status(200).send('Hi '+"LePseudo"+', You look at my protected page :-) !');
-		return next();
-  	});
-
-};
 
 
 /**
@@ -193,7 +170,7 @@ var delZik = function (req,res) {
  */
 
 	// Check for the api if token
-	appApi.all('/*', isAuth);
+	//appApi.all('/*', isAuth);
 
 	appApi.route('/ziks')
 			.get(getAllZiks) // Get All ziks

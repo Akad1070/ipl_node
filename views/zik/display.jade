@@ -10,14 +10,15 @@ block content
 				p
 					| Listing  zik
 	if ziks
-		ul
-			each zik in ziks
-				li
+		each zik in ziks
+			ul.ziks
+				li.zik
 					a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title,act='update')= zik.title
-					|  from &nbsp;
-					a.act(href='/ziks/list/author/'+zik.author, title='List all zik of '+ zik.author,act='list')=  zik.author
-				li Genre : #{zik.genre}
-				a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title,act='update')  Update the details
-				br
-				a.act(href='/ziks/delete/'+zik.title, title='Delete '+zik.title,act='delete')  Delete this shit
+					|&nbsp;by&nbsp;
+					a.act(href='/ziks/list/author/'+zik.author, title='List all zik of '+ zik.author,act='list',descr="authors")=  zik.author
+				li.zik Genre : #{zik.genre}
+				li.zik
+					a.act(href='/ziks/update/'+zik.title, title='Update '+zik.title,act='update')  Update the details 
+					| - 
+					a.act.zik(href='/ziks/delete/'+zik.title, title='Delete '+zik.title,act='delete')  Delete this shit
 		br

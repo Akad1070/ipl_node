@@ -22,6 +22,8 @@ a{
 
 a:hover{
 	text-decoration : underline;
+	color : white;
+	text-decoration : none;
 }
 
 a.btn {
@@ -237,7 +239,7 @@ form textarea {
     /*float:left;*/
 }
 
-#listing p + ul, #actions p {
+#listing p, #listing ul, #actions p {
 	font-size : 19px;
 }
 
@@ -251,4 +253,21 @@ form textarea {
 	/*width: 60%;*/
 	padding : 17px;
 	
+}
+
+
+
+.ziks {
+    list-style-type: none;
+    padding: 0;
+    border: 1px solid grey;
+}
+
+.ziks > .zik {
+    padding: 8px 16px;
+    border-bottom: 1px solid grey;
+}
+
+.ziks > li:last-child {
+    border-bottom: none
 }

@@ -9,21 +9,20 @@
  * Load modules
  */
  // Build - Install
-var express = require('express');
+var appZiks = require('express').Router();
 
 // Mine - Custom
 var logger = require('../modules/logger');
 var User   = require('../modules/user');
-var appZiks = express.Router();
 
-
-
-var _fields = ['author', 'genre', 'album','title','year'];
 
 
 /**
- * Route methods for /Zik
+ * My private variables
  */
+var _fields = ['author', 'genre', 'album','title','year'];
+
+
 
 
 
@@ -58,8 +57,9 @@ var checkParamTitle = function (req,res,next,title) {
 	User.getZik('title',title, function (err,zik,msg) {
 		// If err throwned or zik is not founded
 		if(err || !zik){
+			if(!zik) err = {'message' :'\'' + title +'\' not found'};
 			logger.warn('[ZikDAO] '+err.message);
-			return req.status(404).send(err);
+			return res.status(404).send(err.message);
 		}
 		logger.info('[ZikDAO] '+msg);
 		req.zik = zik; // Put the zik in the request
@@ -70,12 +70,20 @@ var checkParamTitle = function (req,res,next,title) {
 
 
 
-
+/**
+ *  Render the adding page.
+ */
 var add = function (req,res){
 	res.status(200).render('zik/add',{title : 'New Zik',header : 'Add a new Zik'});
 	res.end();
 };
 
+
+
+/**
+ * The title is unik so if it's not already exists
+ * It added in the DB.
+ */
 var addPosted = function (req,res,next){
 	User.addZik(req.body.title, req.body.author, (req.body.genre || 'Other'), function (err,zik,msg){
 		if(err){
@@ -91,7 +99,7 @@ var addPosted = function (req,res,next){
 
 
 /**
- * Get all Ziks for the requested title,  author ou genre .
+ * Get all Ziks for the requested field through the rendered list.
  */
 var lister = function (req,res,next) {
 	User.listerZik(req.params.field, req.params.val, function (err,docs,msg) {
@@ -104,11 +112,11 @@ var lister = function (req,res,next) {
 		}
 		//console.dir(docs);
 		res.render('zik/display',{
-			    title  : 'Listing Zik'  ,header: 'Zik Page'
-			    ,msg   : msg
-			    ,type  :req.params.field
-			    ,ziks  : docs
-			});
+			title  : 'Listing Zik'  ,header: 'Zik Page'
+			,msg   : msg
+			,type  :req.params.field
+			,ziks  : docs
+		});
 		res.end();
 	});
 };
@@ -130,12 +138,12 @@ var listerBy = function (req,res,next) {
 		}
 		//console.log(datas);
 		res.render('zik/list',{
-				title : 'Listing zik by '+req.params.field
-				,header : 'Zik Page'
-				,msg : msg
-				,type : req.params.field
-				,list : datas
-			});
+			title : 'Listing zik by '+req.params.field
+			,header : 'Zik Page'
+			,msg : msg
+			,type : req.params.field
+			,list : datas
+		});
 		res.end();
 	});
 };
@@ -155,10 +163,10 @@ var getZik = function (req,res,next) {
 		}
 		//console.log(data);
 		res.render('zik/display',{
-				title : 'Updating '+req.params.title
-				,header : 'Updating \''+req.params.title+'\''
-				,ziks : data
-			});
+			title : 'Updating '+req.params.title
+			,header : 'Updating \''+req.params.title+'\''
+			,ziks : data
+		});
 	});
 
 };
@@ -180,33 +188,22 @@ var update = function (req,res,next) {
  */
 var updatePosted = function (req,res,next) {
 	User.updateZik(req.params.title,req.body.title,req.body.author,req.body.genre, function (err,msg){
-			if(err){
-				logger.warn('[ZikDao] '+err.message);
-				return res.status(404).send(err);
-			}else{
-				logger.info('[ZikDao] '+msg);
-				return res.status(200).send(msg);
-			}
-
+		if(err){
+			logger.warn('[ZikDao] '+err.message);
+			return res.status(404).send(err);
+		}else{
+			logger.info('[ZikDao] '+msg);
+			return res.status(200).send(msg);
+		}
 	});
-
 };
 
 
 var delZik = function (req,res,next) {
-	User.getZik('title', req.params.title, function (err,data,msg) {
-		if(err){
-			logger.warn('[ZikDao] '+err.message);
-			res.status(404);
-		}else{
-			logger.info('[ZikDao] '+msg);
-			res.status(200);
-		}
-		res.render('zik/del',{
-			title : 'Deleting '+req.params.title
-			,header : 'Deleting \''+req.params.title+'\''
-			,zikTitle : req.params.title
-		});
+	res.render('zik/del',{
+		title : 'Deleting '+req.params.title
+		,header : 'Deleting \''+req.params.title+'\''
+		,zikTitle : req.zik.title
 	});
 };
 
@@ -229,13 +226,14 @@ var delZikPosted = function (req,res,next) {
 
 
 /**
- * All Routing links for /zik or /zikss
+ * All Routing links for /ziks
  */
 	// Check for the param provided in the URL
 	appZiks.param('field',checkParamField);
 	appZiks.param('title',checkParamTitle);
 	
 	//appZiks.param('options',checkParamOptions);
+
 
 	appZiks.route('/add')
 			.get(add)
@@ -249,14 +247,14 @@ var delZikPosted = function (req,res,next) {
 			.get(delZik)
 			.post(delZikPosted, lister);
 
-	//	/list/title/Echo
+	//	/list/genre/Classic
 	appZiks.get('/list/:field?/:val?',lister);
-
+	
 	appZiks.route('/update/:title')
 			.get(update)
 			.post(updatePosted);
 
-	appZiks.get("/:field/:val",getZik);
+	appZiks.get('/:field/:val',getZik);
 
 
 

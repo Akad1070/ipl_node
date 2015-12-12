@@ -58,6 +58,7 @@ var connect = function (port,dbname,cb) {
         if(err)
             if(cb) return cb(new Error("[Mongo DB] Error on Connecting to "+url +" : " + err.message));
         _db = mongodb;
+
         //mongodb.collection('ziks').remove();
         if(cb) return cb(null,mongodb,"[Mongo DB] Connected to "+ url);
     });
@@ -82,7 +83,7 @@ var getCollection = function (col, callback) {
     _db.collection(col, function (err,colls){
         if(err)
             if (callback) return callback(new Error('[Mongo DB] Unable to retrieve collection ('+col+')'));
-        if (callback) return callback(null, colls);
+        return (callback ?callback(null, colls) : colls);
     });
 };
 
