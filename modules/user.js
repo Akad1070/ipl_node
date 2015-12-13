@@ -60,16 +60,20 @@ var signup = function (user,cb) {
 	userDAO.exist(user.pseudo.trim(), function (err, alreadyExists){
 		if(err)	return ((cb) ? cb(err) : err);
 
-		if(alreadyExists && cb) return cb(null,user.pseudo +' has been already token. Choose another');
+		if(alreadyExists){
+			_retErr = user.pseudo +' has been already token. Choose another';
+			return ( cb ? cb(null,_retErr) : _retErr);
+		}
 
 		// Generate a salt
 	    bcrypt.genSalt(8, function(err, salt) {
-	        if (err)	if(cb) return cb(err);
+	        if(err)	return ((cb) ? cb(err) : err);
+	        
 	        // Hash the password using our new salt
 	        bcrypt.hash(user.passwd, salt, function(err, hash) {
 	    		if(err)	return ((cb) ? cb(err) : err);
-	            // Override the password with the hashed
-	            user.passwd = hash;
+
+	            user.passwd = hash;	// Override the password with the hashed
 	            delete(user.passwd2); // Remove the passwd2 from the object
 				userDAO.insert(user.pseudo.trim(),user,function (err,data) {
 					if(err)

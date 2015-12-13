@@ -141,7 +141,7 @@ var signupPosted = function (req,res,next) {
 	}
 	if(msg){
 		logger.warn('[User] '+msg);
-		return res.status(404).render('signup',{msg : msg});
+		return res.status(404).send(msg);
 	}
 	User.signup(req.body, function (err,msg) {
 		if(err){
@@ -151,7 +151,7 @@ var signupPosted = function (req,res,next) {
 			logger.info('[User] '+msg);
 			res.status(200);
 		}
-		res.send(msg);
+		return res.send(msg);
 	});
 };
 

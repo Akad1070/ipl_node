@@ -19,14 +19,30 @@ var	_anchor 		= window.location.hash,
 		    '403' 	: "Forbidden resource not accessible",
 		    '500' 	: "Internal Server Error",
 		    '503' 	: "Service Unavailable"
-		},
-	    'TokenExpiredError'		:	'Your session has expired. Please login again to continue.',
-	    'msgHeader' : {
+		}
+	    ,'msgHeader'	: {
 	    	'add'	:	'Adding a new Zik',
 	    	'del'	:	'Deleting a Zik',
 	    	'def'	:	'Acting : Doing something :-)',
 	    	'home'	: 	'Welcome on NodeZikApp',
+	    	'list'	:	'Listing zik by ',
 	    	'maj'	:	'Updating a Zik'
+	    	
+	    }
+	    ,'TokenExpiredError'		:	'Your session has expired. Please login again to continue.'
+	    ,'links'	:	{
+	    	'add'	:	'/ziks/add'	
+	    	,'del'	:	'/ziks/delete'	
+	    	,'maj'		:	'/ziks/update'
+	    	,'list'	:	{
+	    		'author'	:	'/ziks/by/author'
+	    		,'genre'	:	'/ziks/by/genre'
+	    		,'title'	:	'/ziks/by/title'
+	    	}
+	    	,'home'		:	'/home'
+	    	,'login'	:	'/login'
+	    	,'logout'	:	'/logout'
+	    	
 	    	
 	    }
 	}
@@ -58,10 +74,12 @@ function launchAjaxRequest(url,type, datas,cbDone,cbFail){
 	reqAjax.fail(function (xhr, textStatus, err) {
 		var errJSON = xhr.responseJSON || {'message' : xhr.responseText };
 		var title 	= _mapMsgs.errorByStatus[xhr.status ] || 'Error',
-			msg		=_mapMsgs.errorByStatus[errJSON.name] || errJSON.message || 'Shit happens';
+			msg		= _mapMsgs.errorByStatus[errJSON.name] || errJSON.message || 'Shit happens';
+		
+		console.dir(errJSON);
 		
 		setFlash(msg, 'error',title);
-		if(errJSON.name === 'TokenExpiredError')
+		if(errJSON.name && errJSON.name === 'TokenExpiredError' ||  errJSON.name === 'JsonWebTokenError')
 			return logUserOut() && displayLoginSignup();
 		if(cbFail)	cbFail(errJSON);
 		
@@ -152,7 +170,7 @@ function displayActing(url,datas){
  */
 function displayHome(){
 	setAnchor('home');
-	displayListing('/ziks/by/title',function (){	// GET All ziks for the homepage
+	displayListing(_mapMsgs.links.list.title,function (){	// GET All ziks for the homepage
 		$header.text(_mapMsgs.msgHeader.home);
 		$listingPanel.prepend('<h2>All ziks added</h2>');
 	});
@@ -169,12 +187,12 @@ function displayListing(url,cbDone,cbFail){
 			$actionPanel.hide(); // Hidden on the action panel
 			$listingPanel.show(); // Diplay the listing content
 			$listingPanel.html(html_data); // Fill the listing div with the page required
-			if(_descr) $header.text('All ziks by '+_descr);
+			if(_descr) $header.text(_mapMsgs.msgHeader.list+_descr);
 			if(cbDone) cbDone();
 		}
-		, function(data) {
-			console.log('Error Index : '+ data);	
-			if(cbFail) cbFail(data);
+		, function(errJSON) {
+			console.log(_anchor+' Login-Signup Error : '+ errJSON);	
+			if(cbFail) cbFail(errJSON);
 		}
 	);
 }
@@ -193,7 +211,7 @@ function displayLoginSignup(url,cbDone){
 			if(cbDone) cbDone();
 		}
 		,function(errJSON) {
-
+			console.log(' Login-Signup Error : '+ errJSON);	
 		}
 	);
 }
@@ -235,7 +253,7 @@ function formHandler(e){
 			break;
 		case 'login' :
 			_fnDone = function (token){
-				console.log("Token de %s  ==> %s",formData.pseudo);
+				console.log("Token de %s  ==> %s",formData.pseudo,token);
 				$loginPanel.hide(); // Hide the login div
 				if(token){
 					sessionStorage.setItem('token',token); // SAve the token in the sessionStorage
@@ -252,9 +270,9 @@ function formHandler(e){
 	launchAjaxRequest(formData.url,formData.method,formData,
 		function (data,status){ // If the AJAX Request is okay ( Status : 200)
 			if(_fnDone) _fnDone(data);
-			displayListing("/ziks/by/title");	
+			displayListing(_mapMsgs.links.list.title);	
 		}, function(errJSON) {
-			console.log('Error Index : '+ errJSON);	
+			console.log(_anchor+' - Error : '+ errJSON);	
 			if(_fnFail) _fnFail(errJSON);
 		}
 	);
@@ -289,7 +307,7 @@ function bindClickOnLinks(e){
 			logUserOut();
 			break; 
 		case 'signup' :
-			displayLoginSignup('/signup')
+			displayLoginSignup('/signup');
 			break;
 		case 'list' :
 			displayListing(url);
@@ -316,13 +334,14 @@ function checkIfAuthUser(){
 function logUserOut(){
 	sessionStorage.removeItem('token');
 	window.location.href = '/'; // Redirect to the homePage
-};
+}
 
 
+
+// mainGame
 $(function() {
 	
-	
-	$("a").on("click", bindClickOnLinks);
+	//$("a").on("click", bindClickOnLinks);
 	
 	// All click on an link is handled by this fct
 	$container.delegate("a", "click", bindClickOnLinks);

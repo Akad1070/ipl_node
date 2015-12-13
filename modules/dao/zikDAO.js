@@ -89,7 +89,7 @@ var listBy = function (obj,cb) {
  */
 var listnSortByField = function (obj,cb) {
 	mongo.getCollection(config.db.mongo.collections.musics , function (err,docZiks){
-		if(err)	return ( (cb) ? cb(err) : null);
+		if(err)	return ( (cb) ? cb(err) : err);
 		mongo.selectAll(docZiks,{},obj,function (err, docs) {
 			var val = Object.keys(obj['fields'])[0]  || 'all';
 			if(err)
