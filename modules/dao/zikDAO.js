@@ -93,8 +93,8 @@ var listnSortByField = function (obj,cb) {
 		mongo.selectAll(docZiks,{},obj,function (err, docs) {
 			var val = Object.keys(obj['fields'])[0]  || 'all';
 			if(err)
-				if(cb) return ( (cb) ? cb(new Error(err.message + ' by '+val)): null);
-			if(cb) return cb(null,docs,'Found '+docs.length+' zik(s) by '+ val);
+				if(cb) return ( (cb) ? cb(new Error(err.message + ' with '+val)): null);
+			if(cb) return cb(null,docs,'Found '+docs.length+' zik(s) with '+ val);
 		});
 	});
 };
@@ -103,7 +103,7 @@ var listnSortByField = function (obj,cb) {
 
 
 /**
- * List one zik by the field specified field.
+ * List one zik with the field specified field.
  * @param {Object}      obj     The obj containing the field & value.
  * @param {Function}    cb      Callback Function
  */

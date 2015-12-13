@@ -102,30 +102,32 @@ var selectAll = function (collects,cond,options,callback){
     	return docs;
     };
     
-    var query = collects;
+
 /*    if(options && options.distinct){
         query.distinct(options.distinct);
     }else{*/
 
-    query = query.find(cond);
+    var query = null;
     
-    if(options && options.distinct){
-        collects.distinct(options.distinct,fnToCall);
+    if(options && options.distinct)
+        return collects.distinct(options.distinct,fnToCall);
         //delete(options.fields);
-    }else{
-        if(options){
-            if(options.sort)
-                query.sort(options.sort);
-            if(options.limit)
-                query.limit(options.limit);
-            if(options.fields){
-                query.fields = options.fields;
-                query.sort(query.fields);
-            }
+    else
+        query = collects.find(cond);
+        
+    if(options){
+        if(options.sort)
+            query.sort(options.sort);
+        if(options.limit)
+            query.limit(options.limit);
+        if(options.fields){
+            query.fields = options.fields;
+            query.sort(query.fields);
         }
-    
-        query.toArray(fnToCall);
     }
+
+    query.toArray(fnToCall);
+    
 };
 
 

@@ -20,7 +20,10 @@ var User   = require('../modules/user');
 /**
  * My private variables
  */
-var _fields = ['author', 'genre', 'album','title','year'];
+var _fields = ['author', 'genre', 'album','title','year']
+	,_sorting = ['asc','desc','DESC','ASC']
+	
+;
 
 
 
@@ -46,6 +49,26 @@ var checkParamField = function (req,res,next,field) {
 		logger.warn('[Server] '+err);
 		return req.status(404).send(err);
 	}
+};
+
+
+var checkParamSort = function (req,res,next,sort) {
+	var err = 'How to list ?!';
+	if(!sort){
+		logger.warn('[Server] '+err);
+		return req.status(404).send(err);
+	}	
+	// The tilde ~ allows to make a true|| false operation
+	// Otherwise, indexof() return a int.
+	if(~_sorting.indexOf(sort)){
+		req.sort = sort;
+		return next();
+	}else{
+		err = sort + " : Unknown";
+		logger.warn('[Server] '+err);
+		return req.status(404).send(err);
+	}
+	
 };
 
 
@@ -128,7 +151,7 @@ var lister = function (req,res,next) {
  * Can also have be sorted by {asc , desc} || ASC by default
  */
 var listerBy = function (req,res,next) {
-	User.listerZikByField(req.field, req.params.sort, function (err,datas,msg) {
+	User.listerZikByField(req.field, req.sort, function (err,datas,msg) {
 		if(err){
 			logger.warn(err.message);
 			res.status(401);
@@ -138,10 +161,10 @@ var listerBy = function (req,res,next) {
 		}
 		//console.log(datas);
 		res.render('zik/list',{
-			title : 'Listing zik by '+req.params.field
+			title : 'Listing zik by '+req.field
 			,header : 'Zik Page'
 			,msg : msg
-			,type : req.params.field
+			,type : req.field
 			,list : datas
 		});
 		res.end();
@@ -231,7 +254,7 @@ var delZikPosted = function (req,res,next) {
 	// Check for the param provided in the URL
 	appZiks.param('field',checkParamField);
 	appZiks.param('title',checkParamTitle);
-	
+	appZiks.param('sort',checkParamSort);
 	//appZiks.param('options',checkParamOptions);
 
 
@@ -241,7 +264,7 @@ var delZikPosted = function (req,res,next) {
 
 	//	/by/genre/asc
 	//	/by/author/desc/distinct
-	appZiks.get('/by/:field/:sort?(asc||desc||DESC||ASC)/:options?', listerBy);
+	appZiks.get('/by/:field/:sort?/:options?', listerBy);
 
 	appZiks.route('/delete/:title')
 			.get(delZik)

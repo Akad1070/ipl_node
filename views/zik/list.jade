@@ -6,9 +6,14 @@ block content
 		h3
 			if msg
 				| #{msg}
+				| sort by 
+				a.list(href='/ziks/by/'+type+'/asc', title='Listing in ascending ',act='list') Ascending
+				|&nbsp;-&nbsp;
+				a.list(href='/ziks/by/'+type+'/desc',title='Listing in descending ',act='list') Descending
 			else
 				p
 					| Listing  zik
+
 
 	if list
 		ul
